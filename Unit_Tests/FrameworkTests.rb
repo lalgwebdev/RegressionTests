@@ -54,8 +54,8 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		
 		it 'should find that WatirUser exists' do
 			@bAdmin.goto("#{Domain}/admin/people")	
-			@bAdmin.text_field(id: 'edit-name').set('watirUser')
-			@bAdmin.button(id: 'edit-submit-admin-views-user').click
+			@bAdmin.text_field(id: 'edit-user').set('watirUser')
+			@bAdmin.button(id: 'edit-submit-user-admin-people').click
 			user = @bAdmin.link(text: /watirUser/i).wait_until(&:exists?)
 			expect(user).to exist
 		end
@@ -77,10 +77,10 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		end
 		it 'should find no User data' do
 			@bAdmin.goto("#{Domain}/admin/people")	
-			@bAdmin.text_field(id: 'edit-name').set('watirUser')
-			@bAdmin.button(id: 'edit-submit-admin-views-user').click
-			@bAdmin.wait_until { |b| (b.tbody.text.downcase.include?('watiruser')) || (b.tbody.text.include?('No users'))  }
-			row = @bAdmin.tbody.tr(text: /No users/)
+			@bAdmin.text_field(id: 'edit-user').set('watirUser')
+			@bAdmin.button(id: 'edit-submit-user-admin-people').click
+			@bAdmin.wait_until { |b| (b.tbody.text.downcase.include?('watiruser')) || (b.tbody.text.include?('No people'))  }
+			row = @bAdmin.tbody.tr(text: /No people/)
 			expect(row).to exist
 		end
 	end
@@ -98,10 +98,8 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			} 	
 			after(:all) { logoutUser }			
 			
-			it 'should have a Logout entry on the menu' do
-				@bUser.li(id: 'menu-5618-1').click
-				menu = @bUser.link(text: /Logout/)
-				expect(menu).to exist
+			it 'should have correct Page Title' do
+				expect(@bUser.title).to match(/watirUser|My Profile/)
 			end
 		end	
 	end

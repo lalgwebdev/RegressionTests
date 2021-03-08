@@ -102,18 +102,22 @@ def createUser
 	$clickCount += 2
 end
 
-# Delete End Users
-def deleteUsers
+# Delete End User
+def deleteUser
 	# Go to Drupal Users and find WatirUser
 	@bAdmin.goto("#{Domain}/admin/people")	
-	@bAdmin.text_field(id: 'edit-name').set('watirUser')
-	@bAdmin.button(id: 'edit-submit-admin-views-user').click
-	@bAdmin.wait_until { |b| (b.tbody.text.downcase.include?('watiruser')) || (b.tbody.text.include?('No users'))  }
+	@bAdmin.text_field(id: 'edit-user').set('watirUser')
+	@bAdmin.button(id: 'edit-submit-user-admin-people').click
+	@bAdmin.wait_until { |b| (b.tbody.text.downcase.include?('watiruser')) || (b.tbody.text.include?('No people'))  }
 	if (@bAdmin.tbody.text.downcase.include?('watiruser'))
 		# Delete User
 		row = @bAdmin.tbody.tr(text: /watirUser/i)
-		row.link(text: 'Cancel account').click
+		row.checkbox(class: 'form-checkbox').set
+		@bAdmin.select_list(id: 'edit-action').select 'user_cancel_user_action'
+		@bAdmin.button(id: 'edit-submit').click
+		@bAdmin.h1(text: /Are you sure/).wait_until(&:exists?)
 		btn = @bAdmin.button(id: 'edit-submit').wait_until(&:exists?)
+		sleep(1)
 		btn.click
 		@bAdmin.wait_until { |b| b.title =~ /People/ }
 	end
@@ -135,7 +139,7 @@ def cleanData
 	# Check if any exist
 	results = @bAdmin.div(class: 'crm-results-block', text: /No results/)
 	if (results.exists?) 
-		# Skip
+		# Skip if none
 	else
 		# Select all
 		@bAdmin.radio(value: 'ts_all').click
@@ -147,8 +151,8 @@ def cleanData
 	end
 	$clickCount += 4
 	
-	# Delete Drupal Users
-	deleteUsers
+	# Delete Drupal User
+	deleteUser
 end
 
 
