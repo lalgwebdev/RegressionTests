@@ -1,6 +1,6 @@
 ###############  LALG Membership System - Regression Tests  ##################
 
-# Utilities for Unit Test Regression test scripts to run under Rspec
+# Utilities for Regression test scripts to run under Rspec
 # Functions called by Test Definitions in Test**.rb
 
 ########################################################################
@@ -119,7 +119,6 @@ def deleteUsers
 	end
 	$clickCount += 4
 end
-
 
 # Clean out Test Data
 # Requires to be logged in as Admin
