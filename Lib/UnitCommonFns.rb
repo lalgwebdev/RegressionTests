@@ -64,3 +64,20 @@ def addMembership (cid)
 	$clickCount += 2
 end
 
+# Renew (Change) Membership
+# For Unit Testing
+def unitRenewMembership (cid)
+	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}&selectedChild=member")
+	btn = @bAdmin.element(:css => 'div#memberships tbody tr td span.btn-slide')
+	btn.click
+	@bAdmin.link(text: 'Renew').click
+	@bAdmin.div(id: 'help').click		#Clear the Date Picker
+	@bAdmin.checkbox(id: 'record_contribution').clear
+	@bAdmin.button(id: '_qf_MembershipRenewal_upload-top').click
+	#Wait for jQuery/AJAX to finish
+	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}
+	# Make sure Contact screen is properly refreshed
+	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+	$clickCount += 4
+end
+

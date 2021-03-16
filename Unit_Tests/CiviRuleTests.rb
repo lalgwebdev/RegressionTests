@@ -54,6 +54,20 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				expect(endDate).to exist
 			end
 		end
+		
+		describe 'Step 3: Change Membership' do
+			before(:all) { 
+				unitRenewMembership (@cid)
+			}		
+			it 'should find Membership details in HH Custom Fields updated' do			
+				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+				hhFields = @bAdmin.element(:css => 'div.Household_Fields div.collapsible-title').wait_until(&:exists?)
+				hhFields.click
+				expectedYear = Date.today.year + 2
+				endDate = @bAdmin.div(class: 'crm-custom-data', text: /#{expectedYear}/)
+				expect(endDate).to exist
+			end		
+		end
 	end	
 
 # Close Test Case Wrapper	
