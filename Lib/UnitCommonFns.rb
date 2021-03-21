@@ -14,7 +14,8 @@ def createContact
 	puts 'Create Individual Contact'
 	@bAdmin.goto("#{Domain}/civicrm/contact/add?reset=1&ct=Individual")
 	@bAdmin.text_field(id: 'first_name').set('Joe')	
-	@bAdmin.text_field(id: 'last_name').set('WatirUser')	
+	@bAdmin.text_field(id: 'last_name').set('WatirUser')
+	@bAdmin.text_field(id: 'email_1_email').set('watiruser@lalg.org.uk')
 	@bAdmin.button(id: '_qf_Contact_upload_view-top').click	
 	@cid = @bAdmin.span(class: 'crm-contact-contact_id').text
 	$clickCount += 1
@@ -64,7 +65,7 @@ def addMembership (cid)
 	$clickCount += 2
 end
 
-# Renew (Change) Membership
+# Renew Membership
 # For Unit Testing
 def unitRenewMembership (cid)
 	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}&selectedChild=member")
@@ -74,6 +75,22 @@ def unitRenewMembership (cid)
 	@bAdmin.div(id: 'help').click		#Clear the Date Picker
 	@bAdmin.checkbox(id: 'record_contribution').clear
 	@bAdmin.button(id: '_qf_MembershipRenewal_upload-top').click
+	#Wait for jQuery/AJAX to finish
+	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}
+	# Make sure Contact screen is properly refreshed
+	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+	$clickCount += 4
+end
+
+# Change Membership
+# For Unit Testing
+def unitChangeMembership (cid)
+	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}&selectedChild=member")
+	btn = @bAdmin.element(:css => 'div#memberships tbody tr td span.btn-slide')
+	btn.click
+	@bAdmin.link(class: 'action-item', text: 'Edit').click
+	@bAdmin.select_list(id: 'membership_type_id_1').select('8')
+	@bAdmin.button(visible_text: 'Save').click
 	#Wait for jQuery/AJAX to finish
 	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}
 	# Make sure Contact screen is properly refreshed
