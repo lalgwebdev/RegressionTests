@@ -119,21 +119,26 @@ def setUserFields (setMAction: 0)
 	@bAdmin.button(id: '_qf_CustomData_upload').click
 end
 
-def chkEmail (numActs: 0)
+def chkActivity (numActs: 0, activity: :membershipActivity)
 	context 'Check Email Sent' do
-		it 'should have the Email Sent Activity set' do
+		it 'should have the Expected Activity set' do
 			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
 			# Check number of Activities
 			acts = @bAdmin.li(id: 'tab_activity', visible_text: /Activities/).wait_until(&:exists?)
 			expect(acts.text).to match(/#{numActs}/)
-			# Check the Email Sent Activity
+			# Check the most recent Activity
 			@bAdmin.li(id: 'tab_activity').click			 
 			tbl = @bAdmin.table(class: 'contact-activity-selector-activity')
 			tbl.wait_until(&:exists?)
 			row = @bAdmin.element(:css => "table.contact-activity-selector-activity tbody tr:first-of-type")
 			row.wait_until(&:exists?)
-			act = row.td(class: 'crmf-subject', text: 'LALG Membership Card')
-			expect(act).to exist
+			if (activity == :membershipActivity)
+				subject = row.td(class: 'crmf-subject', text: 'LALG Membership Card')
+				expect(subject).to exist
+			else
+				actType = row.element(:css => "td:first-of-type")
+				expect(actType.text).to include('Postal Reminder')
+			end
 		end
 	end
 end
@@ -171,7 +176,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			} 
 			chkMembership
 			chkTags(chkPrint: true)
-			chkEmail(numActs: 2)
+			chkActivity(numActs: 2)
 		end
 		
 		describe 'Step 3: Renew Membership' do
@@ -182,7 +187,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}		
 			chkMembership(yearOffset: 2)
 			chkTags(chkPrint: true)
-			chkEmail(numActs: 4)
+			chkActivity(numActs: 4)
 		end
 		
 		describe 'Step 4: Change Membership' do
@@ -193,7 +198,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}		
 			chkMembership(memberType: 'Printed', yearOffset: 2)
 			chkTags(chkPrint: true)
-			chkEmail(numActs: 6)
+			chkActivity(numActs: 6)
 		end
 		
 		describe 'Step 5: Request Replacement' do
@@ -202,7 +207,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				setTags(setReplacement: true)
 			}		
 			chkTags(chkPrint: true)
-			chkEmail(numActs: 7)
+			chkActivity(numActs: 7)
 		end		
 		
 	end	
@@ -269,6 +274,28 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			$clickCount += 1
 		end
 	end	
+	
+	####### Test Postal Reminder if Email Scheduled Reminder fails
+	describe 'Test-13 Postal Reminder if Email Scheduled Reminder fails' do
+		before(:all) { 
+			puts 'Test-13 Postal Reminder if Email Scheduled Reminder fails'
+			deleteContacts
+			createContact(noEmail: true)
+			addMembership (@cid)
+			changeEndDate(offset: 29, status: 'Renewal', cid: @cid)
+			# Run the Scheduled Job
+			@bAdmin.goto("#{Domain}/civicrm/admin/job?action=view&id=9&reset=1")
+			
+						# @bAdmin.goto("#{Domain}/civicrm/admin/job?reset=1")
+			# row = @bAdmin.tr(id: 'job-9').wait_until(&:exists?)
+			# row.span(text: /more/).click
+			# row.link(text: /Execute Now/).click
+			
+			@bAdmin.button(id: '_qf_Job_submit-top').click
+			@bAdmin.h1(class: 'page-title', text: /Settings - Scheduled Jobs/).wait_until(&:exists?)
+		} 
+		chkActivity(numActs: 3, activity: :postalReminder)
+	end
 	
 
 # Close Test Case Wrapper	

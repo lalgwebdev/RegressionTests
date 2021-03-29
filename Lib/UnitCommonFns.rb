@@ -10,12 +10,16 @@
 # Create Individual Contact
 # For Unit Testing, uses CiviCRM admin screens
 #   Returns - sets @cid to created Contact Id
-def createContact
+def createContact (noEmail: false)
 	puts 'Create Individual Contact'
 	@bAdmin.goto("#{Domain}/civicrm/contact/add?reset=1&ct=Individual")
 	@bAdmin.text_field(id: 'first_name').set('Joe')	
 	@bAdmin.text_field(id: 'last_name').set('WatirUser')
-	@bAdmin.text_field(id: 'email_1_email').set('watiruser@lalg.org.uk')
+	if (noEmail)
+		#Skip
+	else
+		@bAdmin.text_field(id: 'email_1_email').set('watiruser@lalg.org.uk')
+	end
 	@bAdmin.button(id: '_qf_Contact_upload_view-top').click	
 	@cid = @bAdmin.span(class: 'crm-contact-contact_id').text
 	$clickCount += 1
