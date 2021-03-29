@@ -154,4 +154,49 @@ def cleanData
 	deleteUser
 end
 
+#########################################################################
+########################  Shared Test Function Methods  #################
+#########################################################################
 
+#  Change Membership End Date and (hence) Status
+def changeEndDate (offset: 365, status: 'New', cid: nil)
+	puts 'ChangeEndDate to ' + offset.to_s + ' days'
+	# Get Contact Summary
+	if (cid)
+		@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")	
+	else
+		@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
+		@bAdmin.text_field(id: 'sort_name').set('WatirUser')
+		@bAdmin.button(id: '_qf_Basic_refresh').click	
+		rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
+		# Get Household Summary
+		@bAdmin.element(:css => "div.crm-search-results tbody").link(visible_text: /Household/).click
+	end
+
+	# Get Membership
+	@bAdmin.li(id: 'tab_member', visible_text: /Memberships/).click
+	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for AJAX to finish
+	mLnk = @bAdmin.link(class: 'action-item', text: 'Edit').wait_until(&:exists?)
+	mLnk.click
+	# Goto Edit
+	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for AJAX to finish
+	#@bAdmin.link(id: 'crm-membership-edit-button-top').click
+	# Set Join and Start dates to a long time ago
+	join = @bAdmin.element(:css => "tr.crm-membership-form-block-join_date input.crm-form-date").wait_until(&:exists?)
+	start = @bAdmin.element(:css => "tr.crm-membership-form-block-start_date input.crm-form-date").wait_until(&:exists?)
+	endDate = @bAdmin.element(:css => "tr.crm-membership-form-block-end_date input.crm-form-date").wait_until(&:exists?)
+	join.to_subtype.set('01/01/2004')
+	start.to_subtype.set('01/01/2004')	
+	# Calculate End date by offset from today
+	day = Date.today + offset
+	day = day.strftime("%d/%m/%Y")
+	endDate.to_subtype.set(day)
+	# Save
+	@bAdmin.element(:css => 'div.ui-dialog-buttonset button:first-of-type').click
+	# AJAX on pop-up, and then again on main form
+	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for AJAX to finish
+	newStatus = @bAdmin.td(class: 'crm-membership-status').wait_until(&:exists?)
+	Watir::Wait.until { newStatus.text.include? status }
+	puts newStatus.text
+	$clickCount += 6
+end
