@@ -10,3 +10,10 @@ D7 site compatible.  Does not work on D8 site.
 Repartitioning of previous version to improve maintainability.
 Update for the Permission needed to run Stripe in Test mode.
 
+Release v3.1
+Changes to the framework structure to run on D8 site.
+
+Release 3.1.3
+Unit Tests framework added.
+Unit Tests for all required CiviRules completed
+

@@ -4,7 +4,7 @@
 puts 'Test File opened'
 require 'rspec'
 require 'watir'
-require '../Lib/CommonFns.rb'
+require './CommonFns.rb'
 puts 'Libraries loaded'
 
 ################################################################################
