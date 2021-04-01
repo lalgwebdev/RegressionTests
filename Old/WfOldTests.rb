@@ -4,8 +4,8 @@
 puts 'Test File opened'
 require 'rspec'
 require 'watir'
-require '../Lib/CommonFns.rb'
-require '../Lib/WorkflowFns.rb'
+require './CommonFns.rb'
+require './CommonWfFns.rb'
 puts 'Libraries loaded'
 
 ################################################################################
