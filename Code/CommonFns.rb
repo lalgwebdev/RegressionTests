@@ -42,7 +42,7 @@ def loginAdmin
 	end
 	@bAdmin.goto("#{Domain}/user/login")
 	# If Cookie Banner showing, then dismiss it
-	sleep(1)
+	sleep(2)
 	cookie = @bAdmin.div(class: 'eu-cookie-compliance-banner')
 	if (cookie.exists?) 
 		@bAdmin.button(class: 'agree-button').click
@@ -66,7 +66,7 @@ def loginUser
 	end
 	@bUser.goto("#{Domain}/user/login")
 	# If Cookie Banner showing, then dismiss it
-	sleep(1)
+	sleep(2)
 	cookie = @bUser.div(class: 'eu-cookie-compliance-banner')
 	if (cookie.exists?) 
 		@bUser.button(class: 'agree-button').click

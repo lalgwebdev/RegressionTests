@@ -48,7 +48,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 	describe 'Test-12 Create User' do
 		before(:all) { 
 			puts 'Test-12 Create User'
-			deleteUser
+			deleteUsers
 			createUser 
 		} 
 		
