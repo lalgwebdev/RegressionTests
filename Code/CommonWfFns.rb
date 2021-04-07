@@ -387,7 +387,7 @@ def chkPrintCards (additional: 0, noCard: false)
 		if(!noCard)
 			it 'should appear once in the Print Cards screen' do
 				# Go to Print Cards
-				@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=17&reset=1&force=1")
+				@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=21&reset=1&force=1")
 				results = @bAdmin.elements(css: 'div.crm-search-results tbody tr', text: /WatirUser/i)
 				expect(results.length).to eq 1 + additional			
 			end
@@ -425,7 +425,7 @@ def chkPrintCards (additional: 0, noCard: false)
 		end
 		
 		it 'should then be no Watir flags set' do
-			@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=17&reset=1&force=1")
+			@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=21&reset=1&force=1")
 			
 			Watir::Wait.until {
 				@bAdmin.div(class: 'messages').present? ||
