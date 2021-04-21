@@ -29,12 +29,14 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		before(:all) { 
 			puts 'Test-11 Print Membership Cards'
 			deleteContacts
-			createContact	
-			setTags(setPrint: true)
-			setUserFields(setMAction: 2)
+			@cid = createContact	
+			addHouseholdToContact(@cid)
+			setTags(@cid, setPrint: true)
+			setUserFields(@cid, setMAction: 2)
 			addMembership (@cid)			
 		} 
 		
 		chkPrintCards
 	end	
+	
 end

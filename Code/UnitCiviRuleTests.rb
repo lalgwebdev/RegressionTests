@@ -12,12 +12,12 @@ puts 'Libraries loaded'
 ################  Support Functions for these Tests  ###########################
 ################################################################################
 
-def chkMembership  (memberType: 'Membership', 
+def chkMembership  (cid, memberType: 'Membership', 
 					yearOffset: 1)
 					
 	context	'Check Membership' do
 		it 'should find one Membership created' do
-			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
 			mShips = @bAdmin.li(id: 'tab_member', visible_text: /Memberships/).wait_until(&:exists?)
 			expect(mShips.text).to match(/1/)
 			mShips.click
@@ -40,10 +40,10 @@ def chkMembership  (memberType: 'Membership',
 	end
 end
 
-def chkActivity (numActs: 0, activity: :membershipActivity)
+def chkActivity (cid, numActs: 0, activity: :membershipActivity)
 	context 'Check Email Sent' do
 		it 'should have the Expected Activity set' do
-			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
 			# Check number of Activities
 			acts = @bAdmin.li(id: 'tab_activity', visible_text: /Activities/).wait_until(&:exists?)
 			expect(acts.text).to match(/#{numActs}/)
@@ -78,7 +78,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		before(:all) { 
 			puts 'Test-11 Process Membership Addition/Changes'
 			deleteContacts
-			createContact			
+			@cid = createContact			
 		} 
 		describe 'Step 1: Check Contact' do
 			it 'should find that Contact exists' do
@@ -91,44 +91,44 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		
 		describe 'Step 2: Add Membership' do
 			before(:all) { 
-				setTags(setMRequested: true)
-				setUserFields(setMAction: 2)
+				setTags(@cid, setMRequested: true)
+				setUserFields(@cid, setMAction: 2)
 				addMembership (@cid)
 			} 
-			chkMembership
-			chkTags(chkPrint: true)
-			chkActivity(numActs: 2)
+			chkMembership(@cid)
+			chkTags(@cid, chkPrint: true)
+			chkActivity(@cid, numActs: 2)
 		end
 		
 		describe 'Step 3: Renew Membership' do
 			before(:all) { 
-				setTags(setMRequested: true)
-				setUserFields(setMAction: 2)
+				setTags(@cid, setMRequested: true)
+				setUserFields(@cid, setMAction: 2)
 				unitRenewMembership (@cid)
 			}		
-			chkMembership(yearOffset: 2)
-			chkTags(chkPrint: true)
-			chkActivity(numActs: 4)
+			chkMembership(@cid, yearOffset: 2)
+			chkTags(@cid, chkPrint: true)
+			chkActivity(@cid, numActs: 4)
 		end
 		
 		describe 'Step 4: Change Membership' do
 			before(:all) { 
-				setTags(setMRequested: true)
-				setUserFields(setMAction: 2)
+				setTags(@cid, setMRequested: true)
+				setUserFields(@cid, setMAction: 2)
 				unitChangeMembership (@cid)
 			}		
-			chkMembership(memberType: 'Printed', yearOffset: 2)
-			chkTags(chkPrint: true)
-			chkActivity(numActs: 6)
+			chkMembership(@cid, memberType: 'Printed', yearOffset: 2)
+			chkTags(@cid, chkPrint: true)
+			chkActivity(@cid, numActs: 6)
 		end
 		
 		describe 'Step 5: Request Replacement' do
 			before(:all) { 
-				setUserFields(setMAction: 3)
-				setTags(setReplacement: true)
+				setUserFields(@cid, setMAction: 3)
+				setTags(@cid, setReplacement: true)
 			}		
-			chkTags(chkPrint: true)
-			chkActivity(numActs: 7)
+			chkTags(@cid, chkPrint: true)
+			chkActivity(@cid, numActs: 7)
 		end		
 		
 	end	
@@ -139,7 +139,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		before(:all) { 
 			puts 'Test-12 Update HH Membership Details'
 			deleteContacts
-			createHousehold			
+			@hhid = createHousehold			
 		} 
 		describe 'Step 1: Check Household' do
 			it 'should find that Household exists' do
@@ -151,10 +151,10 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		
 		describe 'Step 2: Add Membership' do
 			before(:all) { 
-				addMembership (@cid)
+				addMembership (@hhid)
 			} 
 			it 'should find Membership details in HH Custom Fields' do
-				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@hhid}")
 				hhFields = @bAdmin.element(:css => 'div.Household_Fields div.collapsible-title').wait_until(&:exists?)
 				hhFields.click
 				type = @bAdmin.div(class: 'crm-custom-data', text: 'Membership')
@@ -168,10 +168,10 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		
 		describe 'Step 3: Renew Membership' do
 			before(:all) { 
-				unitRenewMembership (@cid)
+				unitRenewMembership (@hhid)
 			}		
 			it 'should find Membership Expiry Date in HH Custom Fields updated' do			
-				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@hhid}")
 				hhFields = @bAdmin.element(:css => 'div.Household_Fields div.collapsible-title').wait_until(&:exists?)
 				hhFields.click
 				expectedYear = Date.today.year + 2
@@ -183,10 +183,10 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		
 		describe 'Step 4: Change Membership' do
 			before(:all) { 
-				unitChangeMembership (@cid)
+				unitChangeMembership (@hhid)
 			}		
 			it 'should find Membership Type details in HH Custom Fields updated' do			
-				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@hhid}")
 				hhFields = @bAdmin.element(:css => 'div.Household_Fields div.collapsible-title').wait_until(&:exists?)
 				hhFields.click
 				type = @bAdmin.div(class: 'crm-custom-data', text: /Printed/)
@@ -201,17 +201,11 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		before(:all) { 
 			puts 'Test-13 Postal Reminder if Email Scheduled Reminder fails'
 			deleteContacts
-			createContact(noEmail: true)
+			@cid = createContact(noEmail: true)
 			addMembership (@cid)
-			changeEndDate(offset: 29, status: 'Renewal', cid: @cid)
+			changeEndDate(@cid, offset: 29, status: 'Renewal', cid: @cid)
 			# Run the Scheduled Job
 			@bAdmin.goto("#{Domain}/civicrm/admin/job?action=view&id=9&reset=1")
-			
-						# @bAdmin.goto("#{Domain}/civicrm/admin/job?reset=1")
-			# row = @bAdmin.tr(id: 'job-9').wait_until(&:exists?)
-			# row.span(text: /more/).click
-			# row.link(text: /Execute Now/).click
-			
 			@bAdmin.button(id: '_qf_Job_submit-top').click
 			@bAdmin.h1(class: 'page-title', text: /Settings - Scheduled Jobs/).wait_until(&:exists?)
 		} 

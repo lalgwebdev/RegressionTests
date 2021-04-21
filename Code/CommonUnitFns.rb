@@ -9,7 +9,7 @@
 
 # Create Individual Contact
 # For Unit Testing, uses CiviCRM admin screens
-#   Returns - sets @cid to created Contact Id
+#   Returns - the created Contact Id 
 def createContact (noEmail: false)
 	puts 'Create Individual Contact'
 	@bAdmin.goto("#{Domain}/civicrm/contact/add?reset=1&ct=Individual")
@@ -21,20 +21,41 @@ def createContact (noEmail: false)
 		@bAdmin.text_field(id: 'email_1_email').set('watiruser@lalg.org.uk')
 	end
 	@bAdmin.button(id: '_qf_Contact_upload_view-top').click	
-	@cid = @bAdmin.span(class: 'crm-contact-contact_id').text
+	cid = @bAdmin.span(class: 'crm-contact-contact_id').text
 	$clickCount += 1
+	return cid
 end
 
 # Create Household
 # For Unit Testing, uses CiviCRM admin screens
-#   Returns - sets @cid to created Contact Id
+#   Returns - the created Household Contact Id 
 def createHousehold
 	puts 'Create Household Contact'
 	@bAdmin.goto("#{Domain}/civicrm/contact/add?reset=1&ct=Household")
 	@bAdmin.text_field(id: 'household_name').set('WatirUser Household')	
 	@bAdmin.button(id: '_qf_Contact_upload_view-top').click	
-	@cid = @bAdmin.span(class: 'crm-contact-contact_id').text
+	hhid = @bAdmin.span(class: 'crm-contact-contact_id').text
 	$clickCount += 1
+	return hhid
+end
+
+# Add (new) Relationship and Household to Contact
+# For Unit Testing, uses CiviCRM admin screens
+# Returns - new Household Id
+def addHouseholdToContact (cid)
+	# Create the Household
+	hhid = createHousehold
+	# Go to Add Relationship Page
+	@bAdmin.goto("#{Domain}/civicrm/contact/view/rel?reset=1&action=add&cid=#{cid}")
+	lnk = @bAdmin.link(class: 'select2-choice').wait_until(&:present?)
+	lnk.click
+	@bAdmin.div(class: 'select2-result-label', text: 'Member of').click
+	@bAdmin.send_keys(:tab, :tab, 'watir')
+	@bAdmin.div(class: 'crm-select2-row-label', text: 'WatirUser Household').click
+#	sleep(1)
+	@bAdmin.button(id: '_qf_Relationship_upload-bottom').click
+	$clickCount += 3
+	return hhid
 end
 
 # Delete Contacts
@@ -82,7 +103,7 @@ def unitRenewMembership (cid)
 	#Wait for jQuery/AJAX to finish
 	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}
 	# Make sure Contact screen is properly refreshed
-	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
 	$clickCount += 4
 end
 
@@ -98,12 +119,12 @@ def unitChangeMembership (cid)
 	#Wait for jQuery/AJAX to finish
 	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}
 	# Make sure Contact screen is properly refreshed
-	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
 	$clickCount += 4
 end
 
-def setTags (setPrint: false, setMRequested: false, setReplacement: false)
-	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+def setTags (cid, setPrint: false, setMRequested: false, setReplacement: false)
+	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
 	@bAdmin.li(id: 'tab_tag').click
 	@bAdmin.div(class: 'contact-tagset').wait_until(&:exists?)
 				
@@ -139,11 +160,23 @@ def setTags (setPrint: false, setMRequested: false, setReplacement: false)
 	$clickCount += 6
 end
 
-def chkTags(chkPrint: false, chkMRequested: false, chkReplacement: false)
+
+def setUserFields (cid, setMAction: 0)
+	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
+	@bAdmin.div(text: 'Latest Membership Action').click
+	@bAdmin.text_field.set("#{setMAction}")
+	@bAdmin.button(id: '_qf_CustomData_upload').click
+end
+
+########################################################################
+########################  Shared Checking Methods  #####################
+#########################################################################
+
+def chkTags(cid, chkPrint: false, chkMRequested: false, chkReplacement: false)
 
 	context	'Check Tags' do
 		it 'should have Print Tag set correctly' do
-			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
 			@bAdmin.li(id: 'tab_tag').click	
 			@bAdmin.div(class: 'contact-tagset').wait_until(&:exists?)
 			tag = @bAdmin.li(class: 'select2-search-choice', text: 'Print Card')
@@ -174,9 +207,3 @@ def chkTags(chkPrint: false, chkMRequested: false, chkReplacement: false)
 	end
 end
 
-def setUserFields (setMAction: 0)
-	@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
-	@bAdmin.div(text: 'Latest Membership Action').click
-	@bAdmin.text_field.set("#{setMAction}")
-	@bAdmin.button(id: '_qf_CustomData_upload').click
-end
