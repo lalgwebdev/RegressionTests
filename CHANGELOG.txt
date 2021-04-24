@@ -16,5 +16,9 @@ Add Unit Tests for CiviRules
 Release v2.1.1
 Minor fixes
 
+Release v2.1.2
+Minor Fix
+
+
 
 
