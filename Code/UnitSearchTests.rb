@@ -36,7 +36,11 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			addMembership (@cid)			
 		} 
 		
+		dirBefore = Dir.glob("#{DOWNLOADS}/*.pdf")
 		chkPrintCards
+		chkDownload (dirBefore)
 	end	
 	
 end
+
+

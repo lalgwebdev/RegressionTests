@@ -3,6 +3,12 @@
 # Utilities for Unit Test Regression test scripts to run under Rspec
 # Functions called by Test Definitions in UnitTest**.rb
 
+########################################################################
+############# Global Configuration Constants etc.  #####################
+########################################################################
+
+DOWNLOADS = "C:/Users/#{ENV['USERNAME']}/Downloads"
+
 #########################################################################
 ########################  Shared General Setup Methods  #################
 #########################################################################
@@ -207,3 +213,20 @@ def chkTags(cid, chkPrint: false, chkMRequested: false, chkReplacement: false)
 	end
 end
 
+def chkDownload (dirBefore, minSize: 2000)
+	context 'Check Download' do
+		it 'should have downloaded a plausible PDF file' do
+			dirAfter = Dir.glob("#{DOWNLOADS}/*.pdf")
+			expect(dirAfter.length).to eq(dirBefore.length + 1) 
+			
+			dirAfter.each do |fname|
+				if dirBefore.include? fname
+					next
+				else
+					expect(File.size(fname)).to be > minSize
+					break
+				end 
+			end
+		end 
+	end 
+end
