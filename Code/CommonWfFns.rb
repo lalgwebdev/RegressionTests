@@ -399,7 +399,6 @@ def chkPrintCards (additional: 0, noCard: false)
 				# Find the Action drop-down
 				tasks = @bAdmin.div(css: 'div.crm-search-tasks tbody div.select2-container').wait_until(&:exists?)
 				expect(tasks).to exist
-				expect(tasks.class_name).to include('select2-container-disabled') 			
 				# Select the WatirUser rows
 				results.each { |row| row.checkbox(class: 'select-row').set(true) }					
 				# Wait for Action frop-down to become enabled
