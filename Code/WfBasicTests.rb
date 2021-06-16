@@ -41,7 +41,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				renewMembership
 			}
 			chkIndividual( withEmail: false, contrib: 2, memberStatus: 'Current', 
-				endDateOffset: 10, duration: 15, activities: 8, lma: 2)
+				endDateOffset: 10, duration: 12, activities: 8, lma: 2)
 			chkPrintCards
 		end
 	end
@@ -76,7 +76,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				changeEndDate(offset: 10, status: 'Renew') 
 				renewMembership(user: :admin, payment: :cheque) 
 			}
-			chkIndividual( contrib: 2, endDateOffset: 10, duration: 15,
+			chkIndividual( contrib: 2, endDateOffset: 10, duration: 12,
 							memberStatus: 'Current', activities: 12, lma: 2 )
 			chkPrintCards
 		end
@@ -86,7 +86,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				changeEndDate(offset: -10, status: 'Overdue') 
 				renewMembership(user: :admin, payment: :cheque) 
 			}
-			chkIndividual( contrib: 3, endDateOffset: -10, duration: 15,
+			chkIndividual( contrib: 3, endDateOffset: -10, duration: 12,
 							memberStatus: 'Current', activities: 18, lma: 2 )
 			chkPrintCards
 		end
@@ -151,7 +151,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				changeEndDate(offset: 10, status: 'Renew') 
 				renewMembership(user: :endUser, payment: :stripe) 
 			}
-			chkIndividual( contrib: 2, endDateOffset: 10, duration: 15,
+			chkIndividual( contrib: 2, endDateOffset: 10, duration: 12,
 							memberStatus: 'Current', activities: 12, lma: 2 )
 			chkPrintCards
 		end
@@ -161,7 +161,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				changeEndDate(offset: -10, status: 'Overdue') 
 				renewMembership(user: :endUser, payment: :stripe) 
 			}
-			chkIndividual( contrib: 3, endDateOffset: -10, duration: 15,
+			chkIndividual( contrib: 3, endDateOffset: -10, duration: 12,
 							memberStatus: 'Current', activities: 18, lma: 2 )
 			chkPrintCards
 		end
@@ -176,7 +176,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		end
 	end	
 
-	######  End User Renew Membership plus Add Member with Pay Later
+	######  End User Renew Membership plus Add Member 
 	describe "Test-52 User Renew Membership plus Add Member" do
 		before(:all) { 
 			puts '*** Test-52 User Renew Membership plus Add Member'
@@ -198,9 +198,9 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}
 			chkHousehold(user: :endUser, memberStatus: 'Current', additional: 1)
 			chkIndividual( contrib: 2, memberStatus: 'Current', 
-				endDateOffset: 10, duration: 15, activities: 12, additional: 1)
+				endDateOffset: 10, duration: 12, activities: 12, additional: 1)
 			chkIndividual( contrib: 0, memberStatus: 'Current', 
-				endDateOffset: 10, duration: 15, activities: 3, additional: 1, chkAddNum: 1)				
+				endDateOffset: 10, duration: 12, activities: 3, additional: 1, chkAddNum: 1)				
 			chkPrintCards(additional: 1)
 		end
 	end	

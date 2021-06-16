@@ -77,9 +77,9 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}
 			chkHousehold( memberStatus: 'Current', additional: 1)
 			chkIndividual( contrib: 2, memberStatus: 'Current', 
-				endDateOffset: 10, duration: 15, activities: 10, additional: 1, lma: 2)
+				endDateOffset: 10, duration: 12, activities: 10, additional: 1, lma: 2)
 			chkIndividual( contrib: 0, memberStatus: 'Current', 
-				endDateOffset: 10, duration: 15, activities: 3, additional: 1, lma: 2, chkAddNum: 1)				
+				endDateOffset: 10, duration: 12, activities: 3, additional: 1, lma: 2, chkAddNum: 1)				
 			chkPrintCards(additional: 1)
 		end
 	end
@@ -159,7 +159,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}
 			chkHousehold(user: :endUser, memberType: 'Membership', memberStatus: 'Current')
 			chkIndividual( contrib: 2, memberStatus: 'Current', 
-				endDateOffset: 10, memberType: 'Membership', duration: 15, activities: 12, lma: 2)
+				endDateOffset: 10, memberType: 'Membership', duration: 12, activities: 12, lma: 2)
 			chkPrintCards
 		end
 	end	

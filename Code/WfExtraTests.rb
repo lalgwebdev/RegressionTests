@@ -53,7 +53,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				renewMembership
 			}
 			chkIndividual( contrib: 2, memberStatus: 'Current', 
-				endDateOffset: 10, duration: 15, activities: 10, lma: 2)
+				endDateOffset: 10, duration: 12, activities: 10, lma: 2)
 			chkPrintCards
 		end
 	end
@@ -99,7 +99,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				changeEndDate(offset: 10, status: 'Renew') 
 				renewMembership(user: :endUser, payment: :stripe) 
 			}
-			chkIndividual( contrib: 2, endDateOffset: 10, duration: 15,
+			chkIndividual( contrib: 2, endDateOffset: 10, duration: 12,
 							memberStatus: 'Current', activities: 11, lma: 2 )
 			chkPrintCards
 		end
