@@ -33,7 +33,7 @@ def additionalMembers (b: @bAdmin, noMembers: 1)
 		txt = fSet.text_field(visible: true, label: 'Last Name')
 		txt.set("WatirUserAdd#{@i}")
 		txt = fSet.text_field(visible: true, label: 'Email')
-		txt.set("watiruser@lalg.org.uk")	
+		txt.set("watiruser#{@i}@lalg.org.uk")	
 		@i += 1
 	end
 	# No server transactions
@@ -104,7 +104,7 @@ def newMember(	user: 		:admin,
 		wf = 'admindetails'
 	else 
 		@b = @bUser
-		wf = 'userdetails?payment=test'
+		wf = 'userdetails'
 	end
 
 	#Fill in the details of Contact, Household and Membership
@@ -324,7 +324,11 @@ def chkIndividual (	withEmail: true,
 			expect(@bAdmin.div(text: 'Home Address').following_sibling(text: /#{@timenow} Watir Street/)).to exist
 			expect(@bAdmin.div(text: 'Billing Address')).not_to exist
 			if withEmail
-				expect(@bAdmin.div(text: 'Home Email').following_sibling(text: /watiruser@lalg.org.uk/i)).to exist
+				if chkAddNum
+					expect(@bAdmin.div(text: 'Home Email').following_sibling(text: /watiruser#{chkAddNum}@lalg.org.uk/i)).to exist
+				else	
+					expect(@bAdmin.div(text: 'Home Email').following_sibling(text: /watiruser@lalg.org.uk/i)).to exist
+				end
 			else
 				expect(@bAdmin.div(text: 'Home Email')).not_to exist
 			end
