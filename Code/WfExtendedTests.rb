@@ -99,7 +99,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		after(:all) { logoutUser }			
 		
 		chkHousehold(user: :endUser, additional: 5)
-		chkIndividual( activities: 9, additional: 5)
+		chkIndividual( activities: 10, additional: 5)
 		chkPrintCards(additional: 5)
 	end
 	
@@ -149,7 +149,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				newMember(user: :endUser, memberType: :printed, payment: :stripe)
 			}
 			chkHousehold(user: :endUser)
-			chkIndividual(contrib: 1, activities: 4, lma: 1)
+			chkIndividual(contrib: 1, activities: 5, lma: 1)
 			chkPrintCards
 		end
 		describe 'Step 2, Renew & Change Membership Type' do
@@ -159,7 +159,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}
 			chkHousehold(user: :endUser, memberType: 'Membership', memberStatus: 'Current')
 			chkIndividual( contrib: 2, memberStatus: 'Current', 
-				endDateOffset: 10, memberType: 'Membership', duration: 12, activities: 12, lma: 2)
+				endDateOffset: 10, memberType: 'Membership', duration: 12, activities: 14, lma: 2)
 			chkPrintCards
 		end
 	end	
