@@ -486,7 +486,7 @@ def chkVisible(membType: true, otm: true, replace: false)
 		puts 'Check Visibility'
 		@bUser.goto("#{Domain}/userdetails")
 	}
-	it 'should show Membershup Type Required correctly' do
+	it 'should show Membership Type Required correctly' do
 		field = @bUser.div(class: 'lalg-wf-membership-type-wrapper').present?
 		expect(field).to eq(membType)
 	end	
@@ -499,6 +499,22 @@ def chkVisible(membType: true, otm: true, replace: false)
 		expect(field).to eq(replace)
 	end
 	$clickCount += 1
+end
+
+# Check Mail Preferences
+def chkMailPrefs(info: false, newsletter: false)
+	# Assumes already on the UserDetails form
+	before (:all) {
+		puts 'Check Mail Preferences'
+	}
+	it 'should show Info preference correctly' do
+		field = @bUser.checkbox(class: 'lalg-wf-emailoptions', label: /Information/)
+		expect(field.checked?).to eq(info)
+	end
+	it 'should show Newsletter preference correctly' do
+		field = @bUser.checkbox(class: 'lalg-wf-emailoptions', label: /Newsletter/)
+		expect(field.checked?).to eq(newsletter)
+	end
 end
 
 # Check all Memberships updated as expected
