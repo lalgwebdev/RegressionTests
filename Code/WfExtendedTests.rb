@@ -163,7 +163,17 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}
 			chkMailPrefs(info: true, newsletter: true)
 		end		
-		$clickCount += 1
+		describe 'Check no defaults if already a member' do
+			before (:all) {
+				# Create Membership and move to Renewal Period
+				newMember(user: :endUser, memberType: :plain, clearPrefs: true, payment: :stripe)
+				changeEndDate(offset: 10, status: 'Renew')
+				@bUser.goto("#{Domain}/userdetails")
+				@bUser.radio(id: /membership-1-membership-membership-type-id-1/).set
+			}
+			chkMailPrefs(info: false, newsletter: false)
+		end
+		$clickCount += 2
 	end
 	
 	######  End User Renew Membership plus Change Membership Type with Stripe

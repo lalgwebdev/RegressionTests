@@ -91,11 +91,12 @@ end
 
 # Admin creates new Member, or End User signs up
 # Requires to be logged in as Admin or End User
-def newMember(	user: 		:admin, 
-				withEmail: 	true, 
+def newMember(	user: 			:admin, 
+				withEmail: 		true, 
 				memberType:		:printed,
-				payment: 	:cheque, 
-				additional: 0)
+				clearPrefs:		false,
+				payment: 		:cheque, 
+				additional:		0)
 	puts 'Do New Member: Email- ' + withEmail.to_s + '  Payment- ' + payment.to_s + '  User- ' + user.to_s
 
 	# Select browser to use
@@ -135,6 +136,10 @@ def newMember(	user: 		:admin,
 		else
 			@b.radio(id: /membership-1-membership-membership-type-id-1/).set
 		end
+	end
+	if clearPrefs 
+		@b.checkbox(class: 'lalg-wf-emailoptions', label: /Information/).clear
+		@b.checkbox(class: 'lalg-wf-emailoptions', label: /Newsletter/).clear
 	end
 	# Additional Members
 	additionalMembers(b: @b, noMembers: additional)
