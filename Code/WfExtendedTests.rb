@@ -55,7 +55,19 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		chkIndividual(activities: 4, memberType: 'Membership', lma: 1)
 		chkPrintCards
 	end
-
+	
+	#######  Admin Stripe Without Email
+	describe "Test-27 Admin Stripe NoEmail" do
+		before(:all) { 
+			puts '*** Test-27 Admin Stripe No Email'
+			cleanData 
+			newMember(user: :admin, withEmail: false, payment: :stripe)
+		} 
+		chkHousehold()
+		chkIndividual(withEmail: false, activities: 4, lma: 1)
+		chkPrintCards
+	end
+	
 	######  Admin Renew Membership plus Add Member at once
 	describe "Test-51 Admin Renew Membership plus Add Member at once" do
 		before(:all) { 

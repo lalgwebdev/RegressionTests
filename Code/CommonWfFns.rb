@@ -51,8 +51,8 @@ def makePayment (b: @bAdmin, payment: :cheque)
 		# Wait for the Payment overlay to vanish.
 		billingItems = @b.table(id: 'wf-crm-billing-items')
 		billingItems.wait_while(&:obscured?)
-		# If radios exist, click Stripe Test
-		ppLabel = @b.label(text: /STRIPE Test/i)		# Case independent
+		# If radios exist, click STRIPE Test
+		ppLabel = @b.label(text: /STRIPE/i)		# Case independent
 		if (ppLabel.exists?) 
 			ppLabel.wait_while(&:obscured?).click	
 		end
@@ -77,7 +77,7 @@ def makePayment (b: @bAdmin, payment: :cheque)
 		expect(total.text).to eq("£ 0.00")
 	end	
 	# Wait for the Payment overlay to vanish, then Click Submit button
-	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for jQuery/AJAX to finish
+#	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for jQuery/AJAX to finish
 	sleep(1)
 	here = @b.url
 	submit = @b.button(class: 'webform-submit')
@@ -328,6 +328,8 @@ def chkIndividual (	withEmail: true,
 			expect(@bAdmin.div(text: 'Contact Type').following_sibling(text: 'Individual')).to exist
 			expect(@bAdmin.div(text: 'Home Address').following_sibling(text: /#{@timenow} Watir Street/)).to exist
 			expect(@bAdmin.div(text: 'Billing Address')).not_to exist
+			expect(@bAdmin.div(text: 'Billing Email')).not_to exist
+			
 			if withEmail
 				if chkAddNum
 					expect(@bAdmin.div(text: 'Home Email').following_sibling(text: /watiruser#{chkAddNum}@lalg.org.uk/i)).to exist
