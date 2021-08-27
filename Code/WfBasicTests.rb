@@ -32,7 +32,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				newMember(user: :admin, withEmail: false, payment: :cheque)
 			}
 			chkHousehold()
-			chkIndividual( withEmail: false, contrib: 1, activities: 3, lma: 1)
+			chkIndividual( withEmail: false, contrib: 1, activities: 4, lma: 1)
 			chkPrintCards
 		end
 		describe 'Step 2, Renew' do
@@ -41,7 +41,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				renewMembership
 			}
 			chkIndividual( withEmail: false, contrib: 2, memberStatus: 'Current', 
-				endDateOffset: 10, duration: 12, activities: 8, lma: 2)
+				endDateOffset: 10, duration: 12, activities: 10, lma: 2)
 			chkPrintCards
 		end
 	end
