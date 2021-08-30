@@ -28,7 +28,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			newMember(user: :admin, withEmail: false, payment: :cheque)
 		} 
 		chkHousehold()
-		chkIndividual(withEmail: false, activities: 3, lma: 1)
+		chkIndividual(withEmail: false, activities: 4, lma: 1)
 		chkPrintCards
 	end
 
