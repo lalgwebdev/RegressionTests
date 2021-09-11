@@ -13,6 +13,8 @@ WF_HH = 'edit-submitted-civicrm-2-contact-1-fieldset-fieldset-civicrm-2'
 
 #		Watir.default_timeout = 15
 
+AddExtension = true
+
 ################################################################################
 #####################  Business Process Setup Methods  #########################
 #  Go through the business process to the point where outcome can be verified
@@ -222,6 +224,27 @@ def replaceCard ( user: :admin)
 	$clickCount += 4  	#Average of 3 and 5
 end
 
+# Calculate length of Extension for spreading renewal dates.
+# A bit flaky, but for temporary use only.
+def calcExtension (oldEndDate, lma)
+	if AddExtension	and lma == 2				#Quick & dirty way to turn off and on
+		# Set Parameters
+		threshold = 0
+		cutoff = 365*20.0						# Force floating point calculation, to mirror PHP
+		cap = 240.0
+		
+		startDate = Date.parse("1/1/2004")
+		days = (oldEndDate - startDate).to_i - threshold
+		if days <= 0
+			return 0
+		end
+		extn = (days/((cutoff - threshold)/cap)).round
+		return [extn, cap].min
+	else
+		return 0
+	end
+end 
+
 ################################################################################
 ####################  Process Verification Shared Examples  ####################
 ################################################################################
@@ -239,7 +262,7 @@ def chkHousehold (	user: :admin,
 		if (user == :admin) 
 			it "should return to the Find Contacts screen" do
 				@bAdmin.text_field(id: 'edit-id').wait_until(&:present?)	
-				expect(@bAdmin.title).to eq 'Find Contacts | LALG'
+				expect(@bAdmin.title).to include('Find Contacts')
 			end
 		else
 			it "should show the Thank You screen" do		
@@ -380,7 +403,8 @@ def chkIndividual (	withEmail: true,
 			newEndDateTxt = @bAdmin.element(:css => 'td.crm-membership-end_date').wait_until(&:exists?)
 			newEndDate = (Date.parse newEndDateTxt.text)
 			oldEndDate = Date.today + endDateOffset
-			expect(newEndDate).to eq(oldEndDate >> duration)		# Expected Period One Year.
+			expectedEndDate = (oldEndDate >> duration) + calcExtension(oldEndDate, lma)
+			expect(newEndDate).to eq(expectedEndDate)		# Expected Period One Year.
 		end 
 		
 		it 'should have correct number of Individual Activities set' do 
