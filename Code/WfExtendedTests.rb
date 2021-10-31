@@ -1,5 +1,6 @@
 ###############  LALG Membership System - Regression Tests  ##################
 ###############             Workflow Tests - Extended       ##################
+#####  Extensions to Basic Tests to give full set of Confidence Tests  #######
 
 puts 'Test File opened'
 require 'rspec'

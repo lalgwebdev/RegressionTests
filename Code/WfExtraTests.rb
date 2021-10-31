@@ -1,5 +1,6 @@
 ###############  LALG Membership System - Regression Tests  ##################
 ###############             Workflow Tests - Extra          ##################
+######  Odd tests now subsumed in Confidence Tests, but still usable   #######
 
 puts 'Test File opened'
 require 'rspec'

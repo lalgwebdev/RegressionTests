@@ -7,10 +7,6 @@
 ############# Global Configuration Constants etc.  #####################
 ########################################################################
 
-# Shortcuts etc.
-WF_C1 = 'edit-submitted-civicrm-1-contact-1-fieldset-fieldset-civicrm-1'
-WF_HH = 'edit-submitted-civicrm-2-contact-1-fieldset-fieldset-civicrm-2'
-
 #		Watir.default_timeout = 15
 
 ################################################################################
@@ -65,11 +61,6 @@ def makePayment (b: @bAdmin, payment: :cheque)
 			@b.send_keys(i)
 			sleep(0.1)
 		end
-
-	when :payLater
-		#Wait for the Payment overlay to vanish, then Click Pay Later
-		ppLabel = @b.label(text: 'Pay Offline')
-		ppLabel.wait_while(&:obscured?).click	
 	when :free
 		# Just click Submit 
 		total = @b.element(css: "tr#wf-crm-billing-total td:nth-child(2)")
@@ -80,11 +71,11 @@ def makePayment (b: @bAdmin, payment: :cheque)
 	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for jQuery/AJAX to finish
 	sleep(1)
 	here = @b.url
-	submit = @b.button(class: 'webform-submit')
+	submit = @b.button(id: 'edit-actions-submit')
 	submit.wait_while(&:obscured?).click
 	# Wait until payment completed
 	Watir::Wait.until { @b.url != here }
-#	$clickCount += 1
+	$clickCount += 1
 end	
 
 ################  Called from Test Spec   #####################
@@ -111,27 +102,23 @@ def newMember(	user: 			:admin,
 	#Fill in the details of Contact, Household and Membership
 	@b.goto("#{Domain}/#{wf}")
 	@b.text_field(id: /contact-1-contact-first-name/).set('Joe')
-	@b.text_field(id: "#{WF_C1}-contact-1-contact-last-name").set('WatirUser')
+	@b.text_field(id: /contact-1-contact-last-name/).set('WatirUser')
 	if withEmail
-		@b.text_field(id: "#{WF_C1}-contact-1-email-email").set('watiruser@lalg.org.uk')
+		@b.text_field(id: /contact-1-email-email/).set('watiruser@lalg.org.uk')
 	end
 	@timenow = Time.now.strftime("%H%M")
-	@b.text_field(id: "#{WF_HH}-contact-1-address-street-address").set("#{@timenow} Watir Street")
-	@b.text_field(id: "#{WF_HH}-contact-1-address-city").set('Testtown')
-	@b.text_field(id: "#{WF_HH}-contact-1-address-postal-code").set('JW1 1JW')
+	@b.text_field(id: /contact-1-address-street-address/).set("#{@timenow} Watir Street")
+	@b.text_field(id: /contact-1-address-city/).set('Testtown')
+	@b.text_field(id: /contact-1-address-postal-code/).set('JW1 1JW')
 	# Select Membership Type
 	if user == :admin
-		if memberType == :otm
-			@b.select_list(id: /membership-1-membership-membership-type-id/).select(/Online/)
-		elsif memberType == :printed
+		if memberType == :printed
 			@b.select_list(id: /membership-1-membership-membership-type-id/).select(/Printed/)
 		else
 			@b.select_list(id: /membership-1-membership-membership-type-id/).select('Membership')
 		end
 	else
-		if memberType == :otm
-			@b.radio(id: /membership-1-membership-membership-type-id-3/).set
-		elsif memberType == :printed
+		if memberType == :printed
 			@b.radio(id: /membership-1-membership-membership-type-id-2/).set
 		else
 			@b.radio(id: /membership-1-membership-membership-type-id-1/).set
@@ -141,13 +128,15 @@ def newMember(	user: 			:admin,
 		@b.checkbox(class: 'lalg-wf-emailoptions', label: /Information/).clear
 		@b.checkbox(class: 'lalg-wf-emailoptions', label: /Newsletter/).clear
 	end
+	# Next Page
+	@b.button(id: 'edit-actions-wizard-next').click
 	# Additional Members
 	additionalMembers(b: @b, noMembers: additional)
 	# Next Page
-	@b.button(class: 'webform-next').click
+	@b.button(id: 'edit-actions-wizard-next').click
 	# Make Payment
 	makePayment(payment: payment, b: @b)
-	$clickCount += 2
+	$clickCount += 3
 end
 
 # Renews Membership
@@ -159,9 +148,9 @@ def renewMembership(user: :admin,
 	puts 'Do Renew Membership'
 	if user == :admin
 		# Find Contact
-		@bAdmin.goto("#{Domain}/civicrm-find-contacts")
+		@bAdmin.goto("#{Domain}/find-contacts")
 		@bAdmin.text_field(id: "edit-display-name").set('WatirUser')	
-		@bAdmin.button(id: 'edit-submit-civicrm-find-contacts').click	
+		@bAdmin.button(id: 'edit-submit-find-contacts').click	
 		# Goto Admin Details for Joe
 		@bAdmin.link(text: /WatirUser/i).click
 		# Select Membership and continue
@@ -170,13 +159,14 @@ def renewMembership(user: :admin,
 		else
 			@bAdmin.select_list(id: /membership-1-membership-membership-type-id/).select('Membership')
 		end
-		# Additional Members
+		# Next Page
+		@bAdmin.button(id: 'edit-actions-wizard-next').click		# Additional Members
 		additionalMembers(b: @bAdmin, noMembers: additional)
 		# Next Page
-		@bAdmin.button(class: 'webform-next').click
+		@bAdmin.button(id: 'edit-actions-wizard-next').click
 		# Make Payment
 		makePayment(b: @bAdmin, payment: payment)	
-		$clickCount += 4
+		$clickCount += 5
 	else
 		# Go to User Details page
 		@bUser.goto("#{Domain}/userdetails?payment=test")
@@ -186,13 +176,15 @@ def renewMembership(user: :admin,
 		else
 			@bUser.radio(id: /membership-1-membership-membership-type-id-1/).set
 		end
+		# Next Page
+		@bUser.button(id: 'edit-actions-wizard-next').click		
 		# Additional Members
 		additionalMembers(b: @bUser, noMembers: additional)
 		# Next Page
-		@bUser.button(class: 'webform-next').click
+		@bUser.button(id: 'edit-actions-wizard-next').click
 		# Make Payment
 		makePayment(b: @bUser, payment: payment)	
-		$clickCount += 2
+		$clickCount += 3
 	end
 end
 
@@ -204,9 +196,9 @@ def replaceCard ( user: :admin)
 		@b = @bAdmin
 		
 		# Find User and goto details page
-		@b.goto("#{Domain}/civicrm-find-contacts")
+		@b.goto("#{Domain}/find-contacts")
 		@b.text_field(id: "edit-display-name").set('WatirUser')	
-		@b.button(id: 'edit-submit-civicrm-find-contacts').click	
+		@b.button(id: 'edit-submit-find-contacts').click	
 		# Goto Admin Details for Joe
 		@b.link(text: /WatirUser/i).click
 	else 
@@ -217,8 +209,8 @@ def replaceCard ( user: :admin)
 
 	# Set one Replacement Card and continue
 	@b.checkbox(class: 'lalg-wf-replace-tag', index: 0).set(true)
-	@b.button(class: 'webform-next').click
-	@b.button(class: 'webform-submit').click
+	@b.button(id: 'edit-actions-wizard-next').click
+	@b.button(id: 'edit-actions-submit').click
 	$clickCount += 4  	#Average of 3 and 5
 end
 
@@ -239,7 +231,7 @@ def chkHousehold (	user: :admin,
 		if (user == :admin) 
 			it "should return to the Find Contacts screen" do
 				@bAdmin.text_field(id: 'edit-id').wait_until(&:present?)	
-				expect(@bAdmin.title).to eq 'Find Contacts | LALG'
+				expect(@bAdmin.title).to include('Find Contacts')
 			end
 		else
 			it "should show the Thank You screen" do		
@@ -250,19 +242,18 @@ def chkHousehold (	user: :admin,
 		end
 		
 		it 'correct number should appear in Find Contacts' do
-			@bAdmin.goto("#{Domain}/civicrm-find-contacts")
+			@bAdmin.goto("#{Domain}/find-contacts")
 			@bAdmin.text_field(id: 'edit-display-name').set('watiruser')
-			@bAdmin.button(id: 'edit-submit-civicrm-find-contacts').click
-			tbl = @bAdmin.table(class: 'views-table').wait_until(&:present?)
-			expect(tbl).to exist
-			rows = @bAdmin.elements(:css => "table.views-table tbody tr")
+			@bAdmin.button(id: 'edit-submit-find-contacts').click
+			tbl = @bAdmin.table(class: 'sticky-enabled').wait_until(&:present?)
+			rows = @bAdmin.elements(:css => "table.sticky-enabled tbody tr")
 			expect(rows.length).to eq 1	+ additional	
 		end
 
 		it "should appear twice in CiviCRM Contacts Search" do
 			@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
 			@bAdmin.text_field(id: 'sort_name').set('WatirUser')
-			@bAdmin.button(id: '_qf_Basic_refresh').click	
+			@bAdmin.button(id: /_qf_Basic_refresh/i).click	
 			rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
 			expect(rows.length).to eq 2	+ additional	
 		end
@@ -314,7 +305,7 @@ def chkIndividual (	withEmail: true,
 		it 'should have one Individual Contact' do
 			@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
 			@bAdmin.text_field(id: 'sort_name').set('WatirUser')
-			@bAdmin.button(id: '_qf_Basic_refresh').click	
+			@bAdmin.button(id: /_qf_Basic_refresh/i).click	
 			rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
 			expect(rows.length).to eq 2	+ additional
 			if chkAddNum
@@ -396,7 +387,7 @@ def chkPrintCards (additional: 0, noCard: false)
 		if(!noCard)
 			it 'should appear once in the Print Cards screen' do
 				# Go to Print Cards
-				@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=21&reset=1&force=1")
+				@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=20&reset=1&force=1")
 				results = @bAdmin.elements(css: 'div.crm-search-results tbody tr', text: /WatirUser/i)
 				expect(results.length).to eq 1 + additional			
 			end
@@ -433,7 +424,7 @@ def chkPrintCards (additional: 0, noCard: false)
 		end
 		
 		it 'should then be no Watir flags set' do
-			@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=21&reset=1&force=1")
+			@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=20&reset=1&force=1")
 			
 			Watir::Wait.until {
 				@bAdmin.div(class: 'messages').present? ||
@@ -447,41 +438,6 @@ def chkPrintCards (additional: 0, noCard: false)
 			end
 		end
 		$clickCount += 1
-	end
-end
-
-#  Process Pay Later Payments
-def chkReceivePayments
-
-	context 'Check Receive Payment' do 
-		it 'should show one Payment Pending' do
-			@bAdmin.goto("#{Domain}/payments-pending")
-			tbl = @bAdmin.table(class: 'views-table').wait_until(&:present?)
-			expect(tbl).to exist
-			# Count only payments from Test Users
-			results = @bAdmin.elements(css: 'table.views-table tbody tr', text: /WatirUser/i)
-	#		results = @bAdmin.tds(text: /WatirUser/i)
-
-			expect(results.length).to eq 1		
-		end
-		
-		it 'should clear Payments on selecting all rows' do
-			results = @bAdmin.elements(css: 'table.views-table tbody tr', text: /WatirUser/i).each {
-				|row| row.checkbox(class: 'vbo-select').set(true)
-			}
-		
-	#		@bAdmin.checkbox(class: 'vbo-table-select-all').set
-
-			@bAdmin.button(id: 'edit-actionlalg-dutils-complete-pay-later-contribution').click
-			# Allow for other Pending Payments to already exist
-			@bAdmin.wait_until { |b| (b.text =~ /There are no outstanding/) || (b.table(class: 'views-table').present?) }
-			if (@bAdmin.table(class: 'views-table').present?)
-				expect(@bAdmin.elements(css: 'table.views-table tbody tr', text: /WatirUser/i).length).to eq 0
-			else
-				expect(@bAdmin.text).to include('There are no outstanding')
-			end
-		end
-		$clickCount += 2
 	end
 end
 

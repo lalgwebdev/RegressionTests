@@ -50,7 +50,7 @@ def loginAdmin
 	if @bAdmin.title =~ /Log in|Login|My LALG|User account/ 
 		@bAdmin.text_field(id: 'edit-name').set('watir')
 		@bAdmin.text_field(id: 'edit-pass').set('WatirTesting1987!!')
-		@bAdmin.button(id: 'edit-submit').click
+		@bAdmin.button(:css => '#user-login-form #edit-submit').click
 	end
 	# Set count at start of run
 	$clickCount = 3
@@ -74,7 +74,7 @@ def loginUser
 	if @bUser.title =~ /Log in|Login|My LALG|User account/ 
 		@bUser.text_field(id: 'edit-name').set('watirUser')
 		@bUser.text_field(id: 'edit-pass').set('WatirUserTesting%%')
-		@bUser.button(id: 'edit-submit').click
+		@bUser.button(:css => '#user-login-form #edit-submit').click
 	end
 	$clickCount += 3
 end	
@@ -167,7 +167,7 @@ def changeEndDate (offset: 365, status: 'New', cid: nil)
 	else
 		@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
 		@bAdmin.text_field(id: 'sort_name').set('WatirUser')
-		@bAdmin.button(id: '_qf_Basic_refresh').click	
+		@bAdmin.button(id: /_qf_Basic_refresh/i).click	
 		rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
 		# Get Household Summary
 		@bAdmin.element(:css => "div.crm-search-results tbody").link(visible_text: /Household/).click
