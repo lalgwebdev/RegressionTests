@@ -29,7 +29,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			newMember(user: :admin, withEmail: false, payment: :cheque)
 		} 
 		chkHousehold()
-		chkIndividual(withEmail: false, activities: 3, lma: 1)
+		chkIndividual(withEmail: false, activities: 4, lma: 1)
 		chkPrintCards
 	end
 
@@ -56,6 +56,18 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		chkIndividual(activities: 4, memberType: 'Membership', lma: 1)
 		chkPrintCards
 	end
+	
+	#######  Admin STRIPE Payment, Without Email
+	describe "Test-27 Admin STRIPE Payment, Without Email" do
+		before(:all) { 
+			puts '*** Test-27 Admin STRIPE Payment, Without Email'
+			cleanData 
+			newMember(user: :admin, withEmail: false, payment: :stripe)
+		} 
+		chkHousehold()
+		chkIndividual(withEmail: false, activities: 4, lma: 1)
+		chkPrintCards
+	end	
 
 	######  Admin Renew Membership plus Add Member at once
 	describe "Test-51 Admin Renew Membership plus Add Member at once" do

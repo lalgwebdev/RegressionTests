@@ -21,14 +21,16 @@ def additionalMembers (b: @bAdmin, noMembers: 1)
 	@b = b
 	@i = 1
 	while @i <= noMembers do
-		contact = @i+2				# Additional members start at Contact No. 3
-		fSet = @b.fieldset(class: "webform-component--civicrm-#{contact}-contact-1-fieldset-fieldset")
-		fSet.link.click
-		txt = fSet.text_field(visible: true, label: 'First Name')
+		contact = @i			
+		details = @b.details(id: "edit-additional-household-member-#{contact}")
+		if details.summary.attribute_value("aria-expanded") == "false"
+			details.summary.click
+		end
+		txt = details.text_field(visible: true, label: 'First Name')
 		txt.set('Joe')
-		txt = fSet.text_field(visible: true, label: 'Last Name')
+		txt = details.text_field(visible: true, label: 'Last Name')
 		txt.set("WatirUserAdd#{@i}")
-		txt = fSet.text_field(visible: true, label: 'Email')
+		txt = details.text_field(visible: true, label: 'Email')
 		txt.set("watiruser#{@i}@lalg.org.uk")	
 		@i += 1
 	end
@@ -53,8 +55,8 @@ def makePayment (b: @bAdmin, payment: :cheque)
 			ppLabel.wait_while(&:obscured?).click	
 		end
 		# Wait again, then Fill in the Card Details
-		@b.button(class: 'webform-submit').wait_while(&:obscured?)
-		cNum = @b.iframe.text_field(css: 'span.CardField-number input')
+		@b.button(id: 'edit-actions-submit').wait_while(&:obscured?)
+		cNum = @b.iframe.input(index: 1)
 		cNum.click
 		txt = '4000 0082 6000 0000 1230 123JW1 1JW'
 		txt.split("").each do |i|
@@ -67,8 +69,6 @@ def makePayment (b: @bAdmin, payment: :cheque)
 		total.wait_while(&:obscured?)
 		expect(total.text).to eq("£ 0.00")
 	end	
-	# Wait for the Payment overlay to vanish, then Click Submit button
-	Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for jQuery/AJAX to finish
 	sleep(1)
 	here = @b.url
 	submit = @b.button(id: 'edit-actions-submit')
@@ -208,7 +208,7 @@ def replaceCard ( user: :admin)
 	end
 
 	# Set one Replacement Card and continue
-	@b.checkbox(class: 'lalg-wf-replace-tag', index: 0).set(true)
+	@b.checkbox(class: 'lalg-memb-replace-tag', index: 0).set(true)
 	@b.button(id: 'edit-actions-wizard-next').click
 	@b.button(id: 'edit-actions-submit').click
 	$clickCount += 4  	#Average of 3 and 5
