@@ -55,7 +55,7 @@ def makePayment (b: @bAdmin, payment: :cheque)
 			ppLabel.wait_while(&:obscured?).click	
 		end
 		# Wait again, then Fill in the Card Details
-		@b.button(id: 'edit-actions-submit').wait_while(&:obscured?)
+#		@b.button(id: 'edit-actions-submit').wait_while(&:obscured?)
 		cNum = @b.iframe.input(index: 1)
 		cNum.click
 		txt = '4000 0082 6000 0000 1230 123JW1 1JW'
@@ -71,8 +71,7 @@ def makePayment (b: @bAdmin, payment: :cheque)
 	end	
 	sleep(1)
 	here = @b.url
-	submit = @b.button(id: 'edit-actions-submit')
-	submit.wait_while(&:obscured?).click
+	@b.button(id: 'edit-actions-submit').click
 	# Wait until payment completed
 	Watir::Wait.until { @b.url != here }
 	$clickCount += 1
@@ -100,9 +99,19 @@ def newMember(	user: 			:admin,
 	end
 
 	#Fill in the details of Contact, Household and Membership
-	@b.goto("#{Domain}/#{wf}")
-	@b.text_field(id: /contact-1-contact-first-name/).set('Joe')
-	@b.text_field(id: /contact-1-contact-last-name/).set('WatirUser')
+	# May already be on that page in some tests
+	if !(@b.url.include? 'userdetails') && !(@b.url.include? 'admindetails')
+		@b.goto("#{Domain}/#{wf}")
+	end#
+	
+	# Fiddle to get the jQuery that fills in Household Name to fire at the right time.
+	if user != :admin
+		@b.text_field(id: /contact-1-contact-last-name/).click
+	else
+		@b.text_field(id: /contact-1-contact-first-name/).set('Joe')
+		@b.text_field(id: /contact-1-contact-last-name/).set('WatirUser')
+	end 
+	
 	if withEmail
 		@b.text_field(id: /contact-1-email-email/).set('watiruser@lalg.org.uk')
 	end
@@ -119,14 +128,14 @@ def newMember(	user: 			:admin,
 		end
 	else
 		if memberType == :printed
-			@b.radio(id: /membership-1-membership-membership-type-id-2/).set
+			@b.radio(id: /membership-1-membership-membership-type-id-8/).set
 		else
-			@b.radio(id: /membership-1-membership-membership-type-id-1/).set
+			@b.radio(id: /membership-1-membership-membership-type-id-7/).set
 		end
 	end
 	if clearPrefs 
-		@b.checkbox(class: 'lalg-wf-emailoptions', label: /Information/).clear
-		@b.checkbox(class: 'lalg-wf-emailoptions', label: /Newsletter/).clear
+		@b.checkbox(class: 'lalg-memb-emailoptions', label: /Information/).clear
+		@b.checkbox(class: 'lalg-memb-emailoptions', label: /Newsletter/).clear
 	end
 	# Next Page
 	@b.button(id: 'edit-actions-wizard-next').click
@@ -172,9 +181,9 @@ def renewMembership(user: :admin,
 		@bUser.goto("#{Domain}/userdetails?payment=test")
 		# Select Membership and continue
 		if memberType == :printed
-			@bUser.radio(id: /membership-1-membership-membership-type-id-2/).set
+			@bUser.radio(id: /membership-1-membership-membership-type-id-8/).set
 		else
-			@bUser.radio(id: /membership-1-membership-membership-type-id-1/).set
+			@bUser.radio(id: /membership-1-membership-membership-type-id-7/).set
 		end
 		# Next Page
 		@bUser.button(id: 'edit-actions-wizard-next').click		
@@ -237,7 +246,7 @@ def chkHousehold (	user: :admin,
 			it "should show the Thank You screen" do		
 				@bUser.wait_until { |a| a.title =~ /Thank You/ }
 				expect(@bUser.text).to include("Thank You")
-				expect(@bUser.div(id: 'main-content').text).to include(memberType)
+				expect(@bUser.div(class: 'lalg-view-thank-you').text).to include(memberType)
 			end
 		end
 		
@@ -448,7 +457,7 @@ def chkVisible(membType: true, otm: true, replace: false)
 		@bUser.goto("#{Domain}/userdetails")
 	}
 	it 'should show Membership Type Required correctly' do
-		field = @bUser.div(class: 'lalg-wf-membership-type-wrapper').present?
+		field = @bUser.fieldset(class: 'lalg-memb-membership-type-wrapper').present?
 		expect(field).to eq(membType)
 	end	
 	it 'should show OTM Membership correctly' do
@@ -456,7 +465,7 @@ def chkVisible(membType: true, otm: true, replace: false)
 		expect(field).to eq(otm)
 	end	
 	it 'should show Replacement Card correctly' do
-		field = @bUser.input(class: 'lalg-wf-replace-tag').present?
+		field = @bUser.input(class: 'lalg-memb-replace-tag').present?
 		expect(field).to eq(replace)
 	end
 	$clickCount += 1
@@ -469,11 +478,11 @@ def chkMailPrefs(info: false, newsletter: false)
 		puts 'Check Mail Preferences'
 	}
 	it 'should show Info preference correctly' do
-		field = @bUser.checkbox(class: 'lalg-wf-emailoptions', label: /Information/)
+		field = @bUser.checkbox(class: 'lalg-memb-emailoptions', label: /Information/)
 		expect(field.checked?).to eq(info)
 	end
 	it 'should show Newsletter preference correctly' do
-		field = @bUser.checkbox(class: 'lalg-wf-emailoptions', label: /Newsletter/)
+		field = @bUser.checkbox(class: 'lalg-memb-emailoptions', label: /Newsletter/)
 		expect(field.checked?).to eq(newsletter)
 	end
 end

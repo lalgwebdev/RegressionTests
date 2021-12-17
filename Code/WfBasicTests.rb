@@ -2,7 +2,7 @@
 ###############             Workflow Tests - Basic          ##################
 ###############       Minimal set of Confidence Tests       ##################
 
-puts 'Test File opened'
+puts 'Test File opened *** D8 version ***'
 require 'rspec'
 require 'watir'
 require './CommonFns.rb'

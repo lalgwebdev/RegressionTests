@@ -69,7 +69,7 @@ end
 def deleteContacts
 	@bAdmin.goto("#{Domain}/civicrm/contact/search?reset=1")
 	@bAdmin.text_field(id: 'sort_name').set('WatirUser')
-	@bAdmin.button(id: '_qf_Basic_refresh').click
+	@bAdmin.button(id: '_qf_Basic_refresh-bottom').click
 	# Check if any exist
 	resultMT = @bAdmin.div(class: 'crm-results-block-empty')
 	if (resultMT.exists?) 

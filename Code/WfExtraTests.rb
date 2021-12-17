@@ -2,7 +2,7 @@
 ###############             Workflow Tests - Extra          ##################
 ######  Odd tests now subsumed in Confidence Tests, but still usable   #######
 
-puts 'Test File opened'
+puts 'Test File opened *** D8 version ***'
 require 'rspec'
 require 'watir'
 require './CommonFns.rb'
@@ -73,7 +73,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		after(:all) { logoutUser }		
 		
 		chkHousehold(user: :endUser)
-		chkIndividual( activities: 4)
+		chkIndividual( activities: 5)
 		chkPrintCards
 	end
 	
@@ -91,7 +91,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				newMember(user: :endUser, payment: :stripe)
 			}
 			chkHousehold(user: :endUser)
-			chkIndividual(activities: 4, lma: 1)
+			chkIndividual(activities: 5, lma: 1)
 			chkPrintCards
 		end
 		
@@ -101,7 +101,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				renewMembership(user: :endUser, payment: :stripe) 
 			}
 			chkIndividual( contrib: 2, endDateOffset: 10, duration: 12,
-							memberStatus: 'Current', activities: 11, lma: 2 )
+							memberStatus: 'Current', activities: 12, lma: 2 )
 			chkPrintCards
 		end
 	end

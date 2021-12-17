@@ -17,6 +17,8 @@ def chkMembership  (cid, memberType: 'Membership',
 					
 	context	'Check Membership' do
 		it 'should find one Membership created' do
+puts cid
+puts "#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}"
 			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
 			mShips = @bAdmin.li(id: 'tab_member', visible_text: /Memberships/).wait_until(&:exists?)
 			expect(mShips.text).to match(/1/)
@@ -95,6 +97,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				setUserFields(@cid, setMAction: 2)
 				addMembership (@cid)
 			} 
+puts @cid			
 			chkMembership(@cid)
 			chkTags(@cid, chkPrint: true)
 			chkActivity(@cid, numActs: 2)
@@ -209,7 +212,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			@bAdmin.button(id: '_qf_Job_submit-top').click
 			@bAdmin.h1(class: 'page-title', text: /Settings - Scheduled Jobs/).wait_until(&:exists?)
 		} 
-		chkActivity(numActs: 3, activity: :postalReminder)
+		chkActivity(@cid, numActs: 3, activity: :postalReminder)
 	end
 	
 

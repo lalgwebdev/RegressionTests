@@ -2,7 +2,7 @@
 ###############             Workflow Tests - Extended       ##################
 #####  Extensions to Basic Tests to give full set of Confidence Tests  #######
 
-puts 'Test File opened'
+puts 'Test File opened *** D8 version ***'
 require 'rspec'
 require 'watir'
 require './CommonFns.rb'
@@ -165,14 +165,14 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		end
 		describe 'Membership with Printed Newsletter selected' do	
 			before(:all) {
-				@bUser.radio(id: /membership-1-membership-membership-type-id-2/).set
+				@bUser.radio(id: /membership-1-membership-membership-type-id-8/).set
 			}
 			chkMailPrefs(info: true, newsletter: false)
 		end		
 		describe 'Plain Membership selected' do	
 			before(:all) {
-				@bUser.checkbox(class: 'lalg-wf-emailoptions', label: /Information/).clear
-				@bUser.radio(id: /membership-1-membership-membership-type-id-1/).set
+				@bUser.checkbox(class: 'lalg-memb-emailoptions', label: /Information/).clear
+				@bUser.radio(id: /membership-1-membership-membership-type-id-7/).set
 			}
 			chkMailPrefs(info: true, newsletter: true)
 		end		
@@ -182,7 +182,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				newMember(user: :endUser, memberType: :plain, clearPrefs: true, payment: :stripe)
 				changeEndDate(offset: 10, status: 'Renew')
 				@bUser.goto("#{Domain}/userdetails")
-				@bUser.radio(id: /membership-1-membership-membership-type-id-1/).set
+				@bUser.radio(id: /membership-1-membership-membership-type-id-7/).set
 			}
 			chkMailPrefs(info: false, newsletter: false)
 		end

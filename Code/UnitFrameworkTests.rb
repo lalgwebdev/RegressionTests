@@ -1,7 +1,7 @@
 ###############  LALG Membership System - Regression Tests  ##################
 ###############             Unit Tests - Common             ##################
 
-puts 'Test File opened'
+puts 'Test File opened *** D8 version ***'
 require 'rspec'
 require 'watir'
 require './CommonFns.rb'
@@ -48,7 +48,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 	describe 'Test-12 Create User' do
 		before(:all) { 
 			puts 'Test-12 Create User'
-			deleteUsers
+			deleteUser
 			createUser 
 		} 
 		

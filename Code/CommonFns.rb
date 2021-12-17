@@ -41,16 +41,18 @@ def loginAdmin
 		@bAdmin.window.resize_to(1200, 1000)
 	end
 	@bAdmin.goto("#{Domain}/user/login")
+	
 	# If Cookie Banner showing, then dismiss it
 	sleep(2)
 	cookie = @bAdmin.div(class: 'eu-cookie-compliance-banner')
 	if (cookie.exists?) 
 		@bAdmin.button(class: 'agree-button').click
 	end
+	
 	if @bAdmin.title =~ /Log in|Login|My LALG|User account/ 
 		@bAdmin.text_field(id: 'edit-name').set('watir')
 		@bAdmin.text_field(id: 'edit-pass').set('WatirTesting1987!!')
-		@bAdmin.button(:css => '#user-login-form #edit-submit').click
+		@bAdmin.button(:css => '.user-login-form #edit-submit').click
 	end
 	# Set count at start of run
 	$clickCount = 3
@@ -60,21 +62,27 @@ end
 def loginUser
 	createUser
 	if !defined?(@bUser)
-		@bUser = Watir::Browser.new :chrome
+		if ENV['RspecBrowser'] == 'firefox'
+			@bUser = Watir::Browser.new :firefox
+		else
+			@bUser = Watir::Browser.new :chrome
+		end
 		@bUser.window.move_to(600, 0)
 		@bUser.window.resize_to(1200, 1000)
 	end
 	@bUser.goto("#{Domain}/user/login")
+	
 	# If Cookie Banner showing, then dismiss it
 	sleep(2)
 	cookie = @bUser.div(class: 'eu-cookie-compliance-banner')
 	if (cookie.exists?) 
 		@bUser.button(class: 'agree-button').click
 	end
+	
 	if @bUser.title =~ /Log in|Login|My LALG|User account/ 
 		@bUser.text_field(id: 'edit-name').set('watirUser')
 		@bUser.text_field(id: 'edit-pass').set('WatirUserTesting%%')
-		@bUser.button(:css => '#user-login-form #edit-submit').click
+		@bUser.button(:css => '.user-login-form #edit-submit').click
 	end
 	$clickCount += 3
 end	
