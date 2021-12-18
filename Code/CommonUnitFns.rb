@@ -178,37 +178,35 @@ end
 ########################  Shared Checking Methods  #####################
 #########################################################################
 
-def chkTags(cid, chkPrint: false, chkMRequested: false, chkReplacement: false)
+shared_examples "chkTags" do |chkPrint: false, chkMRequested: false, chkReplacement: false|
 
-	context	'Check Tags' do
-		it 'should have Print Tag set correctly' do
-			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
-			@bAdmin.li(id: 'tab_tag').click	
-			@bAdmin.div(class: 'contact-tagset').wait_until(&:exists?)
-			tag = @bAdmin.li(class: 'select2-search-choice', text: 'Print Card')
-			if chkPrint
-				expect(tag).to exist
-			else
-				expect(tag).not_to exist
-			end
+	it 'should have Print Tag set correctly' do
+		@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+		@bAdmin.li(id: 'tab_tag').click	
+		@bAdmin.div(class: 'contact-tagset').wait_until(&:exists?)
+		tag = @bAdmin.li(class: 'select2-search-choice', text: 'Print Card')
+		if chkPrint
+			expect(tag).to exist
+		else
+			expect(tag).not_to exist
 		end
-		
-		it 'should have Membership Requested Tag set correctly' do
-			tag = @bAdmin.li(class: 'select2-search-choice', text: 'Membership Requested')
-			if chkMRequested
-				expect(tag).to exist
-			else
-				expect(tag).not_to exist
-			end
+	end
+	
+	it 'should have Membership Requested Tag set correctly' do
+		tag = @bAdmin.li(class: 'select2-search-choice', text: 'Membership Requested')
+		if chkMRequested
+			expect(tag).to exist
+		else
+			expect(tag).not_to exist
 		end
-		
-		it 'should have Replacement Request Tag set correctly' do
-			tag = @bAdmin.li(class: 'select2-search-choice', text: 'Replacement Request')
-			if chkReplacement
-				expect(tag).to exist
-			else
-				expect(tag).not_to exist
-			end
+	end
+	
+	it 'should have Replacement Request Tag set correctly' do
+		tag = @bAdmin.li(class: 'select2-search-choice', text: 'Replacement Request')
+		if chkReplacement
+			expect(tag).to exist
+		else
+			expect(tag).not_to exist
 		end
 	end
 end

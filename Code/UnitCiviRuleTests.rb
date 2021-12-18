@@ -12,56 +12,51 @@ puts 'Libraries loaded'
 ################  Support Functions for these Tests  ###########################
 ################################################################################
 
-def chkMembership  (cid, memberType: 'Membership', 
-					yearOffset: 1)
+shared_examples "chkMembership" do |memberType: 'Membership', yearOffset: 1|
 					
-	context	'Check Membership' do
-		it 'should find one Membership created' do
-puts cid
-puts "#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}"
-			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
-			mShips = @bAdmin.li(id: 'tab_member', visible_text: /Memberships/).wait_until(&:exists?)
-			expect(mShips.text).to match(/1/)
-			mShips.click
-		end
-		it 'should be the correct Type' do
-			mType = @bAdmin.element(:css => 'td.crm-membership-membership_type').wait_until(&:exists?)
-			if memberType == 'Membership'
-				expect(mType.text).to include(memberType)
-				expect(mType.text).not_to include('Printed')
-			else
-				expect(mType.text).to include(memberType)
-			end
-		end
-		it 'should find correct Expiry Date' do			
-			newEndDate = @bAdmin.element(:css => 'td.crm-membership-end_date').wait_until(&:exists?)
-			expectedYear = Date.today.year + yearOffset
-			expect(newEndDate.text).to match(/#{expectedYear}/)
-		end	
-		$clickCount += 2
+	it 'should find one Membership created' do
+		@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+		mShips = @bAdmin.li(id: 'tab_member', visible_text: /Memberships/).wait_until(&:exists?)
+		expect(mShips.text).to match(/1/)
+		mShips.click
 	end
+	it 'should be the correct Type' do
+		mType = @bAdmin.element(:css => 'td.crm-membership-membership_type').wait_until(&:exists?)
+		if memberType == 'Membership'
+			expect(mType.text).to include(memberType)
+			expect(mType.text).not_to include('Printed')
+		else
+			expect(mType.text).to include(memberType)
+		end
+	end
+	it 'should find correct Expiry Date' do			
+		newEndDate = @bAdmin.element(:css => 'td.crm-membership-end_date').wait_until(&:exists?)
+		expectedYear = Date.today.year + yearOffset
+		expect(newEndDate.text).to match(/#{expectedYear}/)
+	end	
+	$clickCount += 2
 end
 
-def chkActivity (cid, numActs: 0, activity: :membershipActivity)
-	context 'Check Email Sent' do
-		it 'should have the Expected Activity set' do
-			@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{cid}")
-			# Check number of Activities
-			acts = @bAdmin.li(id: 'tab_activity', visible_text: /Activities/).wait_until(&:exists?)
-			expect(acts.text).to match(/#{numActs}/)
-			# Check the most recent Activity
-			@bAdmin.li(id: 'tab_activity').click			 
-			tbl = @bAdmin.table(class: 'contact-activity-selector-activity')
-			tbl.wait_until(&:exists?)
-			row = @bAdmin.element(:css => "table.contact-activity-selector-activity tbody tr:first-of-type")
-			row.wait_until(&:exists?)
-			if (activity == :membershipActivity)
-				subject = row.td(class: 'crmf-subject', text: 'LALG Membership Card')
-				expect(subject).to exist
-			else
-				actType = row.element(:css => "td:first-of-type")
-				expect(actType.text).to include('Postal Reminder')
-			end
+shared_examples "chkActivity" do |numActs: 0, activity: :membershipActivity|
+	it 'should have the correct number of Activities' do
+		@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")
+		# Check number of Activities
+		acts = @bAdmin.li(id: 'tab_activity', visible_text: /Activities/).wait_until(&:exists?)
+		expect(acts.text).to match(/#{numActs}/)
+	end
+	it 'should have the Expected Activity set' do
+		# Check the most recent Activity
+		@bAdmin.li(id: 'tab_activity').click			 
+		tbl = @bAdmin.table(class: 'contact-activity-selector-activity')
+		tbl.wait_until(&:exists?)
+		row = @bAdmin.element(:css => "table.contact-activity-selector-activity tbody tr:first-of-type")
+		row.wait_until(&:exists?)
+		if (activity == :membershipActivity)
+			subject = row.td(class: 'crmf-subject')
+			expect(subject.text).to include('Membership Card').or include('Membership - Status: New')
+		else
+			actType = row.element(:css => "td:first-of-type")
+			expect(actType.text).to include('Postal Reminder')
 		end
 	end
 end
@@ -82,6 +77,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			deleteContacts
 			@cid = createContact			
 		} 
+		
 		describe 'Step 1: Check Contact' do
 			it 'should find that Contact exists' do
 				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")	
@@ -97,10 +93,10 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				setUserFields(@cid, setMAction: 2)
 				addMembership (@cid)
 			} 
-puts @cid			
-			chkMembership(@cid)
-			chkTags(@cid, chkPrint: true)
-			chkActivity(@cid, numActs: 2)
+
+			it_behaves_like "chkMembership"
+			it_behaves_like "chkTags", chkPrint: true
+			it_behaves_like "chkActivity", numActs: 2
 		end
 		
 		describe 'Step 3: Renew Membership' do
@@ -109,9 +105,9 @@ puts @cid
 				setUserFields(@cid, setMAction: 2)
 				unitRenewMembership (@cid)
 			}		
-			chkMembership(@cid, yearOffset: 2)
-			chkTags(@cid, chkPrint: true)
-			chkActivity(@cid, numActs: 4)
+			it_behaves_like "chkMembership", yearOffset: 2
+			it_behaves_like "chkTags", chkPrint: true
+			it_behaves_like "chkActivity", numActs: 4
 		end
 		
 		describe 'Step 4: Change Membership' do
@@ -120,9 +116,9 @@ puts @cid
 				setUserFields(@cid, setMAction: 2)
 				unitChangeMembership (@cid)
 			}		
-			chkMembership(@cid, memberType: 'Printed', yearOffset: 2)
-			chkTags(@cid, chkPrint: true)
-			chkActivity(@cid, numActs: 6)
+			it_behaves_like "chkMembership", memberType: 'Printed', yearOffset: 2
+			it_behaves_like "chkTags", chkPrint: true
+			it_behaves_like "chkActivity", numActs: 6
 		end
 		
 		describe 'Step 5: Request Replacement' do
@@ -130,8 +126,8 @@ puts @cid
 				setUserFields(@cid, setMAction: 3)
 				setTags(@cid, setReplacement: true)
 			}		
-			chkTags(@cid, chkPrint: true)
-			chkActivity(@cid, numActs: 7)
+			it_behaves_like "chkTags", chkPrint: true
+			it_behaves_like "chkActivity", numActs: 7
 		end		
 		
 	end	
@@ -212,7 +208,7 @@ puts @cid
 			@bAdmin.button(id: '_qf_Job_submit-top').click
 			@bAdmin.h1(class: 'page-title', text: /Settings - Scheduled Jobs/).wait_until(&:exists?)
 		} 
-		chkActivity(@cid, numActs: 3, activity: :postalReminder)
+#		chkActivity(@cid, numActs: 3, activity: :postalReminder)
 	end
 	
 

@@ -102,7 +102,6 @@ def createUser
 	@bAdmin.text_field(id: 'edit-mail').set('watiruser@lalg.org.uk')
 	@bAdmin.text_field(id: 'edit-pass-pass1').set('WatirUserTesting%%')
 	@bAdmin.text_field(id: 'edit-pass-pass2').set('WatirUserTesting%%')
-#	@bAdmin.checkbox(label: 'watir tests').set
 	@bAdmin.text_field(id: 'first_name').set('Joe')	
 	@bAdmin.text_field(id: 'last_name').set('WatirUser')
 	@bAdmin.text_field(id: 'postal_code-Primary').set('JW1 1JW')
