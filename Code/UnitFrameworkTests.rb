@@ -40,7 +40,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		}
 
 		it 'should have correct Page Title' do
-			expect(@bAdmin.title).to match(/watir|My Profile/)
+			expect(@bAdmin.title).to match(/My Profile/)
 		end
 	end
 	
@@ -99,7 +99,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			after(:all) { logoutUser }			
 			
 			it 'should have correct Page Title' do
-				expect(@bUser.title).to match(/watirUser|My Profile/)
+				expect(@bUser.title).to match(/My Profile/)
 			end
 		end	
 	end

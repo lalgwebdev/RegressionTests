@@ -1,7 +1,7 @@
  ###############  LALG Membership System - Regression Tests  ##################
 ###############             Unit Tests - Common             ##################
 
-puts 'Test File opened'
+puts 'Test File opened *** D8 version ***'
 require 'rspec'
 require 'watir'
 require './CommonFns.rb'
@@ -142,7 +142,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		} 
 		describe 'Step 1: Check Household' do
 			it 'should find that Household exists' do
-				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@cid}")	
+				@bAdmin.goto("#{Domain}/civicrm/contact/view?reset=1&cid=#{@hhid}")	
 				name = @bAdmin.div(class: 'crm-summary-display_name', visible_text: /WatirUser Household/)
 				expect(name).to exist
 			end
@@ -195,21 +195,38 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		end
 	end	
 	
-	####### Test Postal Reminder if Email Scheduled Reminder fails
-	describe 'Test-13 Postal Reminder if Email Scheduled Reminder fails' do
-		before(:all) { 
-			puts 'Test-13 Postal Reminder if Email Scheduled Reminder fails'
-			deleteContacts
-			@cid = createContact(noEmail: true)
-			addMembership (@cid)
-			changeEndDate(@cid, offset: 29, status: 'Renewal', cid: @cid)
-			# Run the Scheduled Job
-			@bAdmin.goto("#{Domain}/civicrm/admin/job?action=view&id=9&reset=1")
-			@bAdmin.button(id: '_qf_Job_submit-top').click
-			@bAdmin.h1(class: 'page-title', text: /Settings - Scheduled Jobs/).wait_until(&:exists?)
-		} 
-#		chkActivity(@cid, numActs: 3, activity: :postalReminder)
-	end
+	# ####### Test Postal Reminder if Email Scheduled Reminder fails
+	# describe 'Test-13 Postal Reminder if Email Scheduled Reminder fails' do
+		# before(:all) { 
+			# puts 'Test-13 Postal Reminder if Email Scheduled Reminder fails'
+			# puts 'NOTE: This test requires the Watir admin user to have full Admin privilege'
+
+			# if !(@bAdmin.url =~ /\/https:\/\/lalg.org.uk/)
+				# # Divert outbound email to database, unless Live system
+				# @bAdmin.goto("#{Domain}/civicrm/admin/setting/smtp?reset=1")
+				# @bAdmin.radio(id: 'CIVICRM_QFID_5_outBound_option').click
+				# @bAdmin.button(id: '_qf_Smtp_next').click
+			# end
+			# deleteContacts
+			# @cid = createContact(noEmail: true)
+			# addMembership (@cid)
+			# changeEndDate(offset: 29, status: 'Renewal', cid: @cid)
+			# # Run the Scheduled Job
+			# @bAdmin.goto("#{Domain}/civicrm/admin/job?action=view&id=9&reset=1")
+			# @bAdmin.button(id: '_qf_Job_submit-top').click
+			# @bAdmin.link(text: /Add New Scheduled job/i).wait_until(&:exists?)
+		# } 
+		# after(:all) {
+			# # Re-enable outbound email
+			# @bAdmin.goto("#{Domain}/civicrm/admin/setting/smtp?reset=1")
+			# @bAdmin.radio(id: 'CIVICRM_QFID_3_outBound_option').click
+			# @bAdmin.button(id: '_qf_Smtp_next').click
+			
+			# puts 'Please turn off Admin privilege for Watir admin user.'
+		# }
+		
+		# it_behaves_like "chkActivity", numActs: 3, activity: :postalReminder
+	# end
 	
 
 # Close Test Case Wrapper	

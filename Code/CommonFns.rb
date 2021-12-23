@@ -54,6 +54,14 @@ def loginAdmin
 		@bAdmin.text_field(id: 'edit-pass').set('WatirTesting1987!!')
 		@bAdmin.button(:css => '.user-login-form #edit-submit').click
 	end
+	
+	# Collapse bottom Toolbar if showing
+	sleep (2)
+	lnk = @bAdmin.link(:css => '.sf-toolbar .hide-button')
+	if (lnk.exists?)
+		lnk.click
+	end
+	
 	# Set count at start of run
 	$clickCount = 3
 end
