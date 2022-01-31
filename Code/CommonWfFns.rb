@@ -61,7 +61,7 @@ def makePayment (b: @bAdmin, payment: :cheque)
 		txt = '4000 0082 6000 0000 1230 123JW1 1JW'
 		txt.split("").each do |i|
 			@b.send_keys(i)
-			sleep(0.1)
+			sleep(0.2)
 		end
 	when :free
 		# Just click Submit 
@@ -420,7 +420,7 @@ def chkPrintCards (additional: 0, noCard: false)
 				@bAdmin.send_keys(:enter)
 								
 				# Wait for CKEditor panel to load
-				boldIcon = @bAdmin.link(id: 'cke_24').wait_until(&:present?)
+				boldIcon = @bAdmin.link(class: 'cke_button__bold').wait_until(&:present?)
 				expect(boldIcon).to exist
 				# Wait for Template to load
 				@bAdmin.iframe.body(text: /LALG/).wait_until(&:present?)
