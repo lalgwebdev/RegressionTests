@@ -319,6 +319,54 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		$clickCount += 2
 	end
 	
+	######  End User Delete Member
+	describe "Test-46 User Delete Member" do
+		before(:all) { 
+			puts '*** Test-46 User Delete Member'
+			cleanData 
+			loginUser	
+		} 
+		
+		describe 'Step 1, Join, plus 2 Additional Members' do
+			before(:all) {
+				newMember(user: :admin, additional: 2)
+			}
+			chkHousehold(additional: 2)
+			chkIndividual( contrib: 1, activities: 4, additional: 2, lma: 1)
+			chkPrintCards
+		end
+		
+		describe 'Step 2, User deletes Additional Member' do
+			before(:all) {	
+				@bUser.goto("#{Domain}/userdetails")	
+				@bUser.button(id: 'edit-actions-wizard-next').click
+				# Delete both Additional Members
+				@bUser.div(class: 'webform-custom-options-button', data_option_value: 'delete1').click
+				@bUser.div(class: 'webform-custom-options-button', data_option_value: 'delete2').click
+				#Restore first Additional Member
+				@bUser.div(class: 'webform-custom-options-button', data_option_value: 'delete1').click
+			}	
+			it "should have disabled second Additional Member" do
+				expect(@bUser.div(class: 'webform-custom-options-button', data_option_value: 'delete2').text).to match(/Restore member/) 
+				expect(@bUser.text_field(id: /civicrm-4-contact-1-email-email/).attribute_value('readonly')).to be_truthy
+			end
+			it "should delete second Additional member when submitted" do
+				# Submit Form
+				@bUser.button(id: 'edit-actions-submit').click
+				# Count Members
+				@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
+				@bAdmin.text_field(id: 'sort_name').set('WatirUserAdd')
+				@bAdmin.button(id: /_qf_Basic_refresh/i).click	
+				rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
+				expect(rows.length).to eq 1
+				tbody = @bAdmin.element(:css => "div.crm-search-results tbody")
+				expect(tbody.text).to match(/WatirUserAdd1/)
+				$clickCount += 3
+			end
+		end
+	end	
+	
+	
 	######  End User Renew Membership plus Change Membership Type with Stripe
 	describe "Test-54 User Renew plus Change Membership Type with Stripe" do
 		before(:all) { 
