@@ -83,7 +83,7 @@ end
 # Requires to be logged in as Admin or End User
 def newMember(	user: 			:admin, 
 				withEmail: 		true, 
-				memberType:		:printed,
+				memberType:		:printed,		# :printed, :plain, :none
 				clearPrefs:		false,
 				payment: 		:cheque, 
 				additional:		0)
@@ -119,18 +119,20 @@ def newMember(	user: 			:admin,
 	@b.text_field(id: /contact-1-address-street-address/).set("#{@timenow} Watir Street")
 	@b.text_field(id: /contact-1-address-city/).set('Testtown')
 	@b.text_field(id: /contact-1-address-postal-code/).set('JW1 1JW')
-	# Select Membership Type
-	if user == :admin
-		if memberType == :printed
-			@b.select_list(id: /membership-1-membership-membership-type-id/).select(/Printed/)
+	if memberType != :none
+		# Select Membership Type
+		if user == :admin
+			if memberType == :printed
+				@b.select_list(id: /membership-1-membership-membership-type-id/).select(/Printed/)
+			else
+				@b.select_list(id: /membership-1-membership-membership-type-id/).select('Membership')
+			end
 		else
-			@b.select_list(id: /membership-1-membership-membership-type-id/).select('Membership')
-		end
-	else
-		if memberType == :printed
-			@b.radio(id: /membership-1-membership-membership-type-id-8/).set
-		else
-			@b.radio(id: /membership-1-membership-membership-type-id-7/).set
+			if memberType == :printed
+				@b.radio(id: /membership-1-membership-membership-type-id-8/).set
+			else
+				@b.radio(id: /membership-1-membership-membership-type-id-7/).set
+			end
 		end
 	end
 	if clearPrefs 
@@ -141,11 +143,25 @@ def newMember(	user: 			:admin,
 	@b.button(id: 'edit-actions-wizard-next').click
 	# Additional Members
 	additionalMembers(b: @b, noMembers: additional)
-	# Next Page
-	@b.button(id: 'edit-actions-wizard-next').click
-	# Make Payment
-	makePayment(payment: payment, b: @b)
+	# Next Page / Submit
+	if memberType == :none
+		@b.button(id: 'edit-actions-submit').click
+	else
+		@b.button(id: 'edit-actions-wizard-next').click
+		# Make Payment
+		makePayment(payment: payment, b: @b)
+	end
 	$clickCount += 3
+end
+
+# Goes to the Drupal Admin Details form for Joe
+def findJoe()
+	@bAdmin.goto("#{Domain}/find-contacts")
+	@bAdmin.text_field(id: "edit-display-name").set('WatirUser')	
+	@bAdmin.button(id: 'edit-submit-find-contacts').click	
+	# Goto Admin Details for Joe
+	@bAdmin.link(text: 'Joe WatirUser').click
+	$clickCount += 1
 end
 
 # Renews Membership
@@ -157,11 +173,12 @@ def renewMembership(user: :admin,
 	puts 'Do Renew Membership'
 	if user == :admin
 		# Find Contact
-		@bAdmin.goto("#{Domain}/find-contacts")
-		@bAdmin.text_field(id: "edit-display-name").set('WatirUser')	
-		@bAdmin.button(id: 'edit-submit-find-contacts').click	
-		# Goto Admin Details for Joe
-		@bAdmin.link(text: /WatirUser/i).click
+		# @bAdmin.goto("#{Domain}/find-contacts")
+		# @bAdmin.text_field(id: "edit-display-name").set('WatirUser')	
+		# @bAdmin.button(id: 'edit-submit-find-contacts').click	
+		# # Goto Admin Details for Joe
+		# @bAdmin.link(text: /WatirUser/i).click
+		findJoe
 		# Select Membership and continue
 		if memberType == :printed
 			@bAdmin.select_list(id: /membership-1-membership-membership-type-id/).select(/Printed/)
@@ -175,7 +192,7 @@ def renewMembership(user: :admin,
 		@bAdmin.button(id: 'edit-actions-wizard-next').click
 		# Make Payment
 		makePayment(b: @bAdmin, payment: payment)	
-		$clickCount += 5
+		$clickCount += 4
 	else
 		# Go to User Details page
 		@bUser.goto("#{Domain}/userdetails?payment=test")
@@ -279,19 +296,21 @@ def chkHousehold (	user: :admin,
 		end
 		
 		it 'should have one Household Membership' do
-			mTab = @bAdmin.li(id: 'tab_member', visible_text: /Memberships/).wait_until(&:exists?)
-			expect(mTab).to exist
-			expect(mTab.text).to match(/#{mShips}/)
-			mTab.click
-			Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for AJAX to finish
-			mType = @bAdmin.element(:css => 'td.crm-membership-membership_type').wait_until(&:exists?)
-			if memberType == 'Membership'
-				expect(mType.text).to eq(memberType)
-			else
-				expect(mType.text).to include(memberType)
+			if mShips > 0
+				mTab = @bAdmin.li(id: 'tab_member', visible_text: /Memberships/).wait_until(&:exists?)
+				expect(mTab).to exist
+				expect(mTab.text).to match(/#{mShips}/)
+				mTab.click
+				Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for AJAX to finish
+				mType = @bAdmin.element(:css => 'td.crm-membership-membership_type').wait_until(&:exists?)
+				if memberType == 'Membership'
+					expect(mType.text).to eq(memberType)
+				else
+					expect(mType.text).to include(memberType)
+				end
+				mStatus = @bAdmin.element(:css => 'td.crm-membership-status').wait_until(&:exists?)
+				expect(mStatus.text).to eq(memberStatus)
 			end
-			mStatus = @bAdmin.element(:css => 'td.crm-membership-status').wait_until(&:exists?)
-			expect(mStatus.text).to eq(memberStatus)
 		end
 		$clickCount += 6
 	end
@@ -301,7 +320,7 @@ end
 def chkIndividual (	withEmail: true, 
 					activities: 3, 
 					contrib: 1, 
-					mShips: 1, 
+					mShips: 1, 					# Number of Memberships:  0 => don't check
 					memberType: 'Printed', 
 					memberStatus: 'New',
 					endDateOffset: -1,			# Default End Date is one year from yesterday
@@ -311,7 +330,7 @@ def chkIndividual (	withEmail: true,
 					lma: 0)						# Latest Membership Action:  0 => don't check
 					
 	context 'Check Individual' do 
-		it 'should have one Individual Contact' do
+		it 'should have one Individual Contact, plus Additional Members' do
 			@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
 			@bAdmin.text_field(id: 'sort_name').set('WatirUser')
 			@bAdmin.button(id: /_qf_Basic_refresh/i).click	
@@ -342,7 +361,7 @@ def chkIndividual (	withEmail: true,
 			end
 		end 
 		
-		it 'should have one/two Individual Contribution set' do 
+		it 'should have correct number of Individual Contribution set' do 
 			contribTab = @bAdmin.li(id: 'tab_contribute', visible_text: /Contributions/).wait_until(&:exists?)
 			# Count rows rather than using the number in the tab, because 
 			#   this does not include test-mode contributions.
@@ -359,26 +378,30 @@ def chkIndividual (	withEmail: true,
 		end	
 		
 		it 'should have one Individual Membership' do
-			mTab = @bAdmin.li(id: 'tab_member', visible_text: /Memberships/).wait_until(&:exists?)
-			expect(mTab.text).to match(/#{mShips}/)
-			mTab.click
-			Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for AJAX to finish
-			mType = @bAdmin.element(:css => 'td.crm-membership-membership_type').wait_until(&:exists?)
-			if memberType == 'Membership'
-				expect(mType.text).to include(memberType)
-				expect(mType.text).not_to include('Printed')
-			else
-				expect(mType.text).to include(memberType)
+			if mShips > 0
+				mTab = @bAdmin.li(id: 'tab_member', visible_text: /Memberships/).wait_until(&:exists?)
+				expect(mTab.text).to match(/#{mShips}/)
+				mTab.click
+				Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for AJAX to finish
+				mType = @bAdmin.element(:css => 'td.crm-membership-membership_type').wait_until(&:exists?)
+				if memberType == 'Membership'
+					expect(mType.text).to include(memberType)
+					expect(mType.text).not_to include('Printed')
+				else
+					expect(mType.text).to include(memberType)
+				end
+				mStatus = @bAdmin.element(:css => 'td.crm-membership-status').wait_until(&:exists?)
+				expect(mStatus.text).to eq(memberStatus)
 			end
-			mStatus = @bAdmin.element(:css => 'td.crm-membership-status').wait_until(&:exists?)
-			expect(mStatus.text).to eq(memberStatus)
 		end
 		
 		it 'should have the correct End Date' do
-			newEndDateTxt = @bAdmin.element(:css => 'td.crm-membership-end_date').wait_until(&:exists?)
-			newEndDate = (Date.parse newEndDateTxt.text)
-			oldEndDate = Date.today + endDateOffset
-			expect(newEndDate).to eq(oldEndDate >> duration)		# Expected Period One Year.
+			if mShips > 0
+				newEndDateTxt = @bAdmin.element(:css => 'td.crm-membership-end_date').wait_until(&:exists?)
+				newEndDate = (Date.parse newEndDateTxt.text)
+				oldEndDate = Date.today + endDateOffset
+				expect(newEndDate).to eq(oldEndDate >> duration)		# Expected Period One Year.
+			end
 		end 
 		
 		it 'should have correct number of Individual Activities set' do 

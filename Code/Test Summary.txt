@@ -1,0 +1,25 @@
+
+Basic Tests
+        describe "Test-25 Admin Renew Membership No Email" do
+        describe "Test-41 Admin Membership Lifecycle" do
+        describe "Test-35 User Plain Membership" do
+        describe "Test-43 User Membership Lifecycle" do
+        describe "Test-52 User Renew Membership plus Add Member" do
+
+Extended Tests
+        describe "Test-22 Admin New Member NoEmail" do
+        describe "Test-24 Admin Additional Members" do
+        describe "Test-26 Admin Plain Membership" do
+        describe "Test-27 Admin STRIPE Payment, Without Email" do
+        describe "Test-45 Admin Delete Member and Next/Previous" do
+        describe "Test-51 Admin Renew Membership plus Add Member at once" do
+        describe "Test-33 User Additional Members" do
+        describe "Test-42 User Field Visibility" do
+        describe "Test-44 Default Mail Preferences" do
+        describe "Test-54 User Renew plus Change Membership Type with Stripe" do
+		
+Extra Tests
+        describe "Test-21 Admin New Member Email" do
+        describe "Test-23 Admin Renew Membership" do
+        describe "Test-31 User New Member Stripe" do
+        describe "Test-34 User Join and Renew" do

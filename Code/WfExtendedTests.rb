@@ -69,6 +69,137 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		chkPrintCards
 	end	
 
+	######  Admin Delete Member and Next/Previous
+	describe "Test-45 Admin Delete Member and Next/Previous" do
+		before(:all) { 
+			puts '*** Test-45 Admin Delete Member and Next/Previous'
+			cleanData 
+		} 
+		
+		describe 'Step 1, Join, plus 2 Additional Members' do
+			before(:all) {
+				newMember(user: :admin, memberType: :none, additional: 4)
+			}
+			chkHousehold(mShips: 0, additional: 4)
+			chkIndividual( contrib: 0, mShips: 0, activities: 0, additional: 4, lma: 1)
+		end
+		
+		describe 'Step 2, Do Edits, Set Deletions' do
+			before(:all) {
+				findJoe
+				# Edit Joe
+				@bAdmin.text_field(id: /civicrm-1-contact-1-phone-phone/).set('01234-123456')
+				#Next Page
+				@bAdmin.button(id: 'edit-actions-wizard-next').click
+				# Delete first Additional Member
+				@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete1').click
+				# Edit second Additional Member
+				@bAdmin.text_field(id: /civicrm-4-contact-1-phone-phone/).set('01234-123456')
+				@bAdmin.text_field(id: /civicrm-4-contact-1-email-email/).clear
+				# Edit fourth Additional Member
+				@bAdmin.text_field(id: /civicrm-6-contact-1-phone-phone/).set('01234-123456')
+				@bAdmin.text_field(id: /civicrm-6-contact-1-email-email/).clear
+				$clickCount += 1	
+			}
+		
+			it "should have disabled first Additional Member" do
+				expect(@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete1').text).to match(/Restore member/) 
+				expect(@bAdmin.text_field(id: /civicrm-3-contact-1-phone-phone/).attribute_value('readonly')).to be_truthy
+			end
+		end
+		
+		describe 'Step 3, Do Previous/Next, Check Changes' do		
+			before(:all) {	
+				@bAdmin.button(id: 'edit-actions-wizard-prev').click
+				@bAdmin.text_field(id: /civicrm-1-contact-1-phone-phone/).wait_until(&:visible?)
+				@bAdmin.button(id: 'edit-actions-wizard-next').click
+				$clickCount += 2
+			}
+			
+			it 'should have four Additional Members in correct order' do
+				@bAdmin.text_field(id: /civicrm-3-contact-1-contact-last-name/).wait_until(&:visible?)
+				expect(@bAdmin.text_field(id: /civicrm-3-contact-1-contact-last-name/).value).to eq('WatirUserAdd1')
+				expect(@bAdmin.text_field(id: /civicrm-4-contact-1-contact-last-name/).value).to eq('WatirUserAdd2')
+				expect(@bAdmin.text_field(id: /civicrm-5-contact-1-contact-last-name/).value).to eq('WatirUserAdd3')
+				expect(@bAdmin.text_field(id: /civicrm-6-contact-1-contact-last-name/).value).to eq('WatirUserAdd4')
+			end
+			
+			it 'should still have first Additional Member deletion in place' do
+				expect(@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete1').text).to match(/Restore member/) 
+				expect(@bAdmin.text_field(id: /civicrm-3-contact-1-phone-phone/).attribute_value('readonly')).to be_truthy
+			end
+			
+			it 'should still have edits in place' do
+				expect(@bAdmin.text_field(id: /civicrm-4-contact-1-phone-phone/).value).to eq('01234-123456')
+				expect(@bAdmin.text_field(id: /civicrm-4-contact-1-email-email/).text).to be_empty
+			end
+		end
+		
+		describe 'Step 4, Make further Changes and Submit' do		
+			before(:all) {	
+				#Restore first Additional Member
+				@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete1').click
+				# Delete third Additional Member
+				@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete3').click
+				#Reverse edits on fourth Additional Member
+				@bAdmin.text_field(id: /civicrm-6-contact-1-phone-phone/).clear
+				@bAdmin.text_field(id: /civicrm-6-contact-1-email-email/).set('junk@junk.com')
+				# Submit Form
+				@bAdmin.button(id: 'edit-actions-submit').click
+				$clickCount += 1
+			}
+			
+			chkIndividual( contrib: 0, mShips: 0, activities: 0, additional: 3, lma: 1)
+			context 'Check Delete & Edits' do
+				it "should have edited Contact 1 Phone correctly" do
+					sTab = @bAdmin.li(id: 'tab_summary').wait_until(&:exists?)
+					sTab.click
+					Watir::Wait.until { @bAdmin.execute_script("return jQuery.active") == 0}		#Wait for AJAX to finish
+					homePhone = @bAdmin.div(text: 'Home Phone').following_sibling.text
+					expect(homePhone).to eq('01234-123456')
+				end 
+				it "should not have deleted Additional Member 1" do
+					@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
+					@bAdmin.text_field(id: 'sort_name').set('WatirUserAdd')
+					@bAdmin.button(id: /_qf_Basic_refresh/i).click	
+					rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
+					expect(rows.length).to eq 3
+					tbody = @bAdmin.element(:css => "div.crm-search-results tbody")
+					expect(tbody.text).to match(/WatirUserAdd1/)
+					$clickCount += 1
+				end
+				
+				it "should have deleted Additional Member 3" do
+					tbody = @bAdmin.element(:css => "div.crm-search-results tbody")
+					expect(tbody.text).not_to match(/WatirUserAdd3/)
+				end
+				
+				it "should have edited Additional Member 2 Phone and Email correctly" do
+					@bAdmin.element(:css => "div.crm-search-results tbody").link(visible_text: /WatirUserAdd2/).click
+					expect(@bAdmin.div(class: 'crm-summary-display_name', text: /WatirUserAdd2/)).to exist
+					homePhone = @bAdmin.div(text: 'Home Phone').following_sibling.text
+					expect(homePhone).to eq('01234-123456')
+					email = @bAdmin.div(text: 'Email').parent.div(class: 'crm-content') 
+					expect(email.text).to be_empty
+					$clickCount += 1
+				end
+				
+				it "should have edited Additional Member 4 Phone and Email correctly" do
+					@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
+					@bAdmin.text_field(id: 'sort_name').set('WatirUserAdd4')
+					@bAdmin.button(id: /_qf_Basic_refresh/i).click	
+					rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")		
+					@bAdmin.element(:css => "div.crm-search-results tbody").link(visible_text: /WatirUserAdd4/).click
+					phone = @bAdmin.div(text: 'Phone').parent.div(class: 'crm-content')
+					expect(phone.text).to be_empty
+					email = @bAdmin.div(text: 'Home Email').following_sibling.text
+					expect(email).to eq('junk@junk.com')
+					$clickCount += 2
+				end
+			end
+		end
+	end
+	
 	######  Admin Renew Membership plus Add Member at once
 	describe "Test-51 Admin Renew Membership plus Add Member at once" do
 		before(:all) { 
@@ -97,7 +228,6 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		end
 	end
 
-	
 	##############################################################
 	#######  Test End User Actions
 		
