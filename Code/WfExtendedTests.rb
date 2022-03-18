@@ -103,7 +103,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}
 		
 			it "should have disabled first Additional Member" do
-				expect(@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete1').text).to match(/Restore member/) 
+				expect(@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete1').text).to match(/Restore/) 
 				expect(@bAdmin.text_field(id: /civicrm-3-contact-1-phone-phone/).attribute_value('readonly')).to be_truthy
 			end
 		end
@@ -125,7 +125,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			end
 			
 			it 'should still have first Additional Member deletion in place' do
-				expect(@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete1').text).to match(/Restore member/) 
+				expect(@bAdmin.div(class: 'webform-custom-options-button', data_option_value: 'delete1').text).to match(/Restore/) 
 				expect(@bAdmin.text_field(id: /civicrm-3-contact-1-phone-phone/).attribute_value('readonly')).to be_truthy
 			end
 			
@@ -333,7 +333,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			}
 			chkHousehold(additional: 2)
 			chkIndividual( contrib: 1, activities: 4, additional: 2, lma: 1)
-			chkPrintCards
+			chkPrintCards(additional: 2)
 		end
 		
 		describe 'Step 2, User deletes Additional Member' do
@@ -347,7 +347,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				@bUser.div(class: 'webform-custom-options-button', data_option_value: 'delete1').click
 			}	
 			it "should have disabled second Additional Member" do
-				expect(@bUser.div(class: 'webform-custom-options-button', data_option_value: 'delete2').text).to match(/Restore member/) 
+				expect(@bUser.div(class: 'webform-custom-options-button', data_option_value: 'delete2').text).to match(/Restore/) 
 				expect(@bUser.text_field(id: /civicrm-4-contact-1-email-email/).attribute_value('readonly')).to be_truthy
 			end
 			it "should delete second Additional member when submitted" do

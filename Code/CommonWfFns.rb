@@ -417,7 +417,7 @@ def chkPrintCards (additional: 0, noCard: false)
 
 	context 'Check Card Printing' do 
 		if(!noCard)
-			it 'should appear once in the Print Cards screen' do
+			it 'should appear once/n-times in the Print Cards screen' do
 				# Go to Print Cards
 				@bAdmin.goto("#{Domain}/civicrm/contact/search/custom?csid=20&reset=1&force=1")
 				results = @bAdmin.elements(css: 'div.crm-search-results tbody tr', text: /WatirUser/i)
