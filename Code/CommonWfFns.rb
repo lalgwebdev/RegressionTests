@@ -285,7 +285,7 @@ def chkHousehold (	user: :admin,
 		it "should appear twice in CiviCRM Contacts Search" do
 			@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
 			@bAdmin.text_field(id: 'sort_name').set('WatirUser')
-			@bAdmin.button(id: '_qf_Basic_refresh').click	
+			@bAdmin.button(id: '_qf_Basic_refresh-bottom').click	
 			rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
 			expect(rows.length).to eq 2	+ additional	
 		end
@@ -337,7 +337,7 @@ def chkIndividual (	withEmail: true,
 		it 'should have one Individual Contact' do
 			@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
 			@bAdmin.text_field(id: 'sort_name').set('WatirUser')
-			@bAdmin.button(id: '_qf_Basic_refresh').click	
+			@bAdmin.button(id: '_qf_Basic_refresh-bottom').click	
 			rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
 			expect(rows.length).to eq 2	+ additional
 			if chkAddNum
@@ -446,7 +446,7 @@ def chkPrintCards (additional: 0, noCard: false)
 				@bAdmin.send_keys(:enter)
 								
 				# Wait for CKEditor panel to load
-				boldIcon = @bAdmin.link(id: 'cke_24').wait_until(&:present?)
+				boldIcon = @bAdmin.link(id: 'cke_25').wait_until(&:present?)
 				expect(boldIcon).to exist
 				# Wait for Template to load
 				@bAdmin.iframe.body(text: /LALG/).wait_until(&:present?)

@@ -163,7 +163,7 @@ def changeEndDate (offset: 365, status: 'New', cid: nil)
 	else
 		@bAdmin.goto("#{Domain}/civicrm/contact/search/?reset=1")
 		@bAdmin.text_field(id: 'sort_name').set('WatirUser')
-		@bAdmin.button(id: '_qf_Basic_refresh').click	
+		@bAdmin.button(id: '_qf_Basic_refresh-bottom').click	
 		rows = @bAdmin.elements(:css => "div.crm-search-results tbody tr")
 		# Get Household Summary
 		@bAdmin.element(:css => "div.crm-search-results tbody").link(visible_text: /Household/).click
