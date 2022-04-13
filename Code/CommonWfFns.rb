@@ -55,8 +55,7 @@ def makePayment (b: @bAdmin, payment: :cheque)
 			ppLabel.wait_while(&:obscured?).click	
 		end
 		# Wait again, then Fill in the Card Details
-#		@b.button(id: 'edit-actions-submit').wait_while(&:obscured?)
-		cNum = @b.iframe.input(index: 1)
+		cNum = @b.iframe.input(index: 1).wait_until(&:present?)
 		cNum.click
 		txt = '4000 0082 6000 0000 1230 123JW1 1JW'
 		txt.split("").each do |i|
