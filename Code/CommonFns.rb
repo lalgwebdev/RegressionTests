@@ -7,6 +7,15 @@
 ############# Global Configuration Constants etc.  #####################
 ########################################################################
 
+# Agree to Cookies
+def agreeCookies(b)
+	sleep(1)
+	btn = b.button(:css => '.eu-cookie-compliance-banner .agree-button')
+	if (btn.present?)
+		btn.click
+	end
+end
+
 # Select Domain
 domain = ENV['RspecDomain']
 if domain.nil?
@@ -43,11 +52,7 @@ def loginAdmin
 	@bAdmin.goto("#{Domain}/user/login")
 	
 	# If Cookie Banner showing, then dismiss it
-	sleep(2)
-	cookie = @bAdmin.div(class: 'eu-cookie-compliance-banner')
-	if (cookie.exists?) 
-		@bAdmin.button(class: 'agree-button').click
-	end
+	agreeCookies(@bAdmin)
 	
 	if @bAdmin.title =~ /Log in|Login|My LALG|User account/ 
 		@bAdmin.text_field(id: 'edit-name').set('watir')
@@ -80,12 +85,7 @@ def loginUser
 	end
 	@bUser.goto("#{Domain}/user/login")
 	
-	# If Cookie Banner showing, then dismiss it
-	sleep(2)
-	cookie = @bUser.div(class: 'eu-cookie-compliance-banner')
-	if (cookie.exists?) 
-		@bUser.button(class: 'agree-button').click
-	end
+	agreeCookies(@bUser)
 	
 	if @bUser.title =~ /Log in|Login|My LALG|User account/ 
 		@bUser.text_field(id: 'edit-name').set('watirUser')
@@ -142,11 +142,11 @@ end
 # Clean out Test Data
 # Requires to be logged in as Admin
 def cleanData
-	puts'Do Clean Data'
 	# Check Clicks at start of each test
 	chkClicks
 	# Goto Delete Members search
 	@bAdmin.goto("#{Domain}/civicrm/dataprocessor_contact_search/delete_members?reset=1")
+	agreeCookies(@bAdmin)
 	# Search for all Watir test Contacts
 	@bAdmin.text_field(id: 'name_value').set('WatirUser')
 	@bAdmin.button(name: '_qf_Basic_refresh').click
