@@ -38,7 +38,7 @@ def loginAdmin
 		else
 			@bAdmin = Watir::Browser.new :chrome
 		end
-		@bAdmin.window.resize_to(1200, 1000)
+		@bAdmin.window.resize_to(1200, 1400)
 	end
 	@bAdmin.goto("#{Domain}/user/login")
 	# If Cookie Banner showing, then dismiss it
@@ -62,7 +62,7 @@ def loginUser
 	if !defined?(@bUser)
 		@bUser = Watir::Browser.new :chrome
 		@bUser.window.move_to(600, 0)
-		@bUser.window.resize_to(1200, 1000)
+		@bUser.window.resize_to(1200, 1400)
 	end
 	@bUser.goto("#{Domain}/user/login")
 	# If Cookie Banner showing, then dismiss it
