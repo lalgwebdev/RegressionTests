@@ -417,12 +417,10 @@ def chkPrintCards (additional: 0, noCard: false)
 				Watir::Wait.until {!tasks.class_name.include?('select2-container-disabled') }
 				expect(tasks.class_name).not_to include('select2-container-disabled')				
 				# Select and click the link
-				lnk = tasks.link(class: 'select2-choice')
-				expect(lnk).to exist
-				lnk.click
-				@bAdmin.send_keys(:enter)
+				@bAdmin.radio(id: 'CIVICRM_QFID_ts_sel_2').click
+				@bAdmin.send_keys(:tab, :enter, :enter)
 								
-				# Wait for CKEditor panel to load
+	 			# Wait for CKEditor panel to load
 				boldIcon = @bAdmin.link(id: 'cke_25').wait_until(&:present?)
 				expect(boldIcon).to exist
 				# Wait for Template to load
