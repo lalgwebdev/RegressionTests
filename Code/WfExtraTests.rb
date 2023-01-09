@@ -28,6 +28,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			cleanData 
 			newMember(user: :admin, payment: :cheque)
 		} 
+		chkRedirect()
 		chkHousehold() 
 		chkIndividual(activities: 4, lma: 1)
 		chkPrintCards
@@ -44,6 +45,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			before(:all) {
 				newMember(user: :admin, payment: :cheque)
 			}
+			chkRedirect()
 			chkHousehold()
 			chkIndividual( contrib: 1, activities: 4, lma: 1)
 			chkPrintCards
@@ -53,6 +55,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				changeEndDate(offset: 10, status: 'Renew') 
 				renewMembership
 			}
+			chkRedirect()
 			chkIndividual( contrib: 2, memberStatus: 'Current', 
 				endDateOffset: 10, duration: 12, activities: 10, lma: 2)
 			chkPrintCards
@@ -72,6 +75,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		} 	
 		after(:all) { logoutUser }		
 		
+		chkRedirect(user: :endUser)
 		chkHousehold(user: :endUser)
 		chkIndividual( activities: 5)
 		chkPrintCards
@@ -90,6 +94,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			before(:all) {
 				newMember(user: :endUser, payment: :stripe)
 			}
+			chkRedirect(user: :endUser)
 			chkHousehold(user: :endUser)
 			chkIndividual(activities: 5, lma: 1)
 			chkPrintCards
@@ -100,6 +105,7 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 				changeEndDate(offset: 10, status: 'Renew') 
 				renewMembership(user: :endUser, payment: :stripe) 
 			}
+			chkRedirect(user: :endUser)
 			chkIndividual( contrib: 2, endDateOffset: 10, duration: 12,
 							memberStatus: 'Current', activities: 12, lma: 2 )
 			chkPrintCards

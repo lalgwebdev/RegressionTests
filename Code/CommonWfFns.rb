@@ -244,16 +244,11 @@ end
 ################################################################################
 # Verify results of business process
 
-######  Check Household Details  (Actual Tests follow)
+######  Check redirect after payment etc.
 #
-def chkHousehold (	user: :admin, 
-					mShips: 1, 
-					memberType: 'Printed', 
-					memberStatus: 'New',
-					additional: 0)				# Additional Members
-					
-	context 'Check Household' do 
-		if (user == :admin) 
+def chkRedirect (user: :admin, memberType: 'Printed')
+	context 'Check Redirect' do 
+		if (user == :admin)			
 			it "should return to the Find Contacts screen" do
 				@bAdmin.text_field(id: 'edit-id').wait_until(&:present?)	
 				expect(@bAdmin.title).to include('Find Contacts')
@@ -263,9 +258,24 @@ def chkHousehold (	user: :admin,
 				@bUser.wait_until { |a| a.title =~ /Thank You/ }
 				expect(@bUser.text).to include("Thank You")
 				expect(@bUser.div(class: 'lalg-view-thank-you').text).to include(memberType)
+				if (memberType != 'Printed')
+					expect(@bUser.div(class: 'lalg-view-thank-you').text).not_to include('Printed')
+				end
 			end
 		end
-		
+	end
+end
+
+######  Check Household Details  (Actual Tests follow)
+#
+def chkHousehold (	user: :admin, 
+					mShips: 1, 
+					memberType: 'Printed', 
+					memberStatus: 'New',
+					additional: 0)				# Additional Members
+					
+	context 'Check Household' do 
+	
 		it 'correct number should appear in Find Contacts' do
 			@bAdmin.goto("#{Domain}/find-contacts")
 			@bAdmin.text_field(id: 'edit-display-name').set('watiruser')
