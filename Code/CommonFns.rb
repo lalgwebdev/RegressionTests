@@ -19,7 +19,7 @@ puts 'Running on Domain: ' + Domain
 # Throttling routine to pause every so many Clicks
 $clickCount = 0
 def chkClicks
-	if $clickCount > 30
+	if $clickCount > 20
 		puts 'Pausing for Clicks: ' + $clickCount.to_s
 		sleep(60)
 		$clickCount = 0
