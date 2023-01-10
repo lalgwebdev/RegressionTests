@@ -52,6 +52,9 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 			createUser 
 		} 
 		
+		it 'shound redirect to Welcome page' do 
+			expect(@bAdmin.title).to include('Welcome')
+		end
 		it 'should find that WatirUser exists' do
 			@bAdmin.goto("#{Domain}/admin/people")	
 			@bAdmin.text_field(id: 'edit-user').set('watirUser')

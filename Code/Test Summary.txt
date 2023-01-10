@@ -19,7 +19,7 @@ Extended Tests
 		describe "Test-46 User Delete Member" do
         describe "Test-54 User Renew plus Change Membership Type with Stripe" do
 		
-Extra Tests
+Extra Tests  (Included in above, but may be useful stand-alone.)
         describe "Test-21 Admin New Member Email" do
         describe "Test-23 Admin Renew Membership" do
         describe "Test-31 User New Member Stripe" do

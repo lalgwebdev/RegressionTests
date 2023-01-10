@@ -28,7 +28,7 @@ puts 'Running on Domain: ' + Domain
 # Throttling routine to pause every so many Clicks
 $clickCount = 0
 def chkClicks
-	if $clickCount > 30
+	if $clickCount > 20
 		puts 'Pausing for Clicks: ' + $clickCount.to_s
 		sleep(60)
 		$clickCount = 0
@@ -131,6 +131,7 @@ def deleteUser
 		@bAdmin.select_list(id: 'edit-action').select 'user_cancel_user_action'
 		@bAdmin.button(id: 'edit-submit').click
 		@bAdmin.h1(text: /Are you sure/).wait_until(&:exists?)
+		@bAdmin.radio(id: 'edit-user-cancel-method-user-cancel-delete').click
 		btn = @bAdmin.button(id: 'edit-submit').wait_until(&:exists?)
 		sleep(1)
 		btn.click
