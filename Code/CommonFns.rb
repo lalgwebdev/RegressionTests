@@ -146,23 +146,25 @@ def cleanData
 	# Check Clicks at start of each test
 	chkClicks
 	# Goto Delete Members search
-	@bAdmin.goto("#{Domain}/civicrm/dataprocessor_contact_search/delete_members?reset=1")
+	@bAdmin.goto("#{Domain}/civicrm/cancelmembers")
 	agreeCookies(@bAdmin)
 	# Search for all Watir test Contacts
-	@bAdmin.text_field(id: 'name_value').set('WatirUser')
-	@bAdmin.button(name: '_qf_Basic_refresh').click
+	@bAdmin.input(id: 'display-name-1').set('WatirUser')
+	@bAdmin.send_keys(:tab, :tab, :tab, :enter)
 	# Check if any exist
-	results = @bAdmin.div(class: 'crm-results-block', text: /No results/)
-	if (results.exists?) 
+	@bAdmin.wait_until { |b| (b.tbody.text.downcase.include?('watiruser')) || (b.tbody.text.include?('No Contacts'))  }
+	row = @bAdmin.tbody.tr(text: /No Contacts/)
+	if (row.exists?) 
 		# Skip if none
 	else
 		# Select all
-		@bAdmin.radio(value: 'ts_all').click
+		@bAdmin.thead().button(class: 'btn-secondary-outline').click
 		# Select and click the Delete action
+		@bAdmin.send_keys([:shift, :tab], :enter)
 		@bAdmin.send_keys(:tab, :enter)
-		@bAdmin.send_keys(:enter)
+
 		# Confirm
-		@bAdmin.button(id: '_qf_LalgDeleteMembers_done').click
+		@bAdmin.div(class: 'ui-dialog-buttonset').button(text: /LALG Delete Members/).click
 	end
 	$clickCount += 4
 	

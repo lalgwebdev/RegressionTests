@@ -1,7 +1,7 @@
 ###############  LALG Membership System - Regression Tests  ##################
 ###############             Unit Tests - Common             ##################
 
-puts 'Test File opened *** D8 version ***'
+puts 'Test File opened *** D9 version ***'
 require 'rspec'
 require 'watir'
 require './CommonFns.rb'
@@ -72,11 +72,14 @@ describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 		} 
 		
 		it 'should find no Contact data to clean next time' do
-			@bAdmin.goto("#{Domain}/civicrm/dataprocessor_contact_search/delete_members?reset=1")
-			@bAdmin.text_field(id: 'name_value').set('WatirUser')
-			@bAdmin.button(name: '_qf_Basic_refresh').click
-			results = @bAdmin.div(class: 'crm-results-block', text: /No results/)
-			expect(results).to exist
+			# Goto Delete Members search
+			@bAdmin.goto("#{Domain}/civicrm/cancelmembers")
+			# Search for all Watir test Contacts
+			@bAdmin.input(id: 'display-name-1').set('WatirUser')
+			@bAdmin.send_keys(:tab, :tab, :tab, :enter)
+			@bAdmin.wait_until { |b| (b.tbody.text.downcase.include?('watiruser')) || (b.tbody.text.include?('No Contacts'))  }
+			row = @bAdmin.tbody.tr(text: /No Contacts/)
+			expect(row).to exist
 		end
 		it 'should find no User data' do
 			@bAdmin.goto("#{Domain}/admin/people")	
