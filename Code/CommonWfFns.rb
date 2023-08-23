@@ -472,8 +472,9 @@ def chkPrintCards (additional: 0, noCard: false)
 				@bAdmin.tr(css: 'div.crm-search-results tbody tr').present?			
 			}
 			
-			if (@bAdmin.div(class: 'messages').present?)
-				expect(@bAdmin.div(class: 'messages').text).to include('None found')
+			resultsBlock = @bAdmin.div(class: 'crm-results-block')
+			if (resultsBlock.div(class: 'messages').present?)
+				expect(resultsBlock.div(class: 'messages').text).to include('None found')
 			else 
 				expect(@bAdmin.elements(css: 'div.crm-search-results tbody tr', text: /WatirUser/i).length).to eq(0)
 			end

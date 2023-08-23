@@ -19,7 +19,7 @@ end
 # Select Domain
 domain = ENV['RspecDomain']
 if domain.nil?
-	Domain = 'https://d8memb.lalg.org.uk'
+	Domain = 'https://d9test.lalg.org.uk'
 else
 	Domain = "https://#{domain}.lalg.org.uk"
 end
@@ -161,7 +161,7 @@ def cleanData
 		@bAdmin.thead().button(class: 'btn-secondary-outline').click
 		# Select and click the Delete action
 		@bAdmin.send_keys([:shift, :tab], :enter)
-		@bAdmin.send_keys(:tab, :enter)
+		@bAdmin.send_keys(:tab, :tab, :enter)
 
 		# Confirm
 		@bAdmin.div(class: 'ui-dialog-buttonset').button(text: /LALG Delete Members/).click
