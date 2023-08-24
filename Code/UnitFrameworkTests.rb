@@ -24,6 +24,25 @@ describe 'Test-00 Do Nothing' do
 	end
 end
 
+describe 'Test-01 Open Browser' do
+	before(:all) {
+		puts 'Test-01 Open Browser'
+	}
+	
+	it 'should open the front page' do
+		if !defined?(@bAdmin)
+			if ENV['RspecBrowser'] == 'firefox'
+				@bAdmin = Watir::Browser.new :firefox
+			else
+				@bAdmin = Watir::Browser.new :chrome
+			end
+			@bAdmin.window.resize_to(1200, 1400)
+		end
+		@bAdmin.goto("#{Domain}")
+		expect(@bAdmin.title).to match(/Letchworth Arts and Leisure/)
+	end
+end
+
 
 describe "Test Case Wrapper #{Time.now.strftime("%Y-%m-%d %H:%M")}" do
 	

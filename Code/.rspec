@@ -1,0 +1,4 @@
+-f html
+-o 'results.html'
+--fail-fast
+

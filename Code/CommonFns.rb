@@ -161,6 +161,7 @@ def cleanData
 		@bAdmin.thead().button(class: 'btn-secondary-outline').click
 		# Select and click the Delete action
 		@bAdmin.send_keys([:shift, :tab], :enter)
+		sleep(1)
 		@bAdmin.send_keys(:tab, :tab, :enter)
 
 		# Confirm
